@@ -57,6 +57,7 @@ env/
 ENV/
 env.bak/
 venv.bak/
+llama.cpp-benchmarks/
 
 # Jupyter Notebook
 .ipynb_checkpoints/
