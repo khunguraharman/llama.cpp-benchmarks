@@ -328,7 +328,7 @@ def parse_args() -> argparse.Namespace:
         "json_files",
         nargs="*",
         type=Path,
-        help="JSON files to parse. Defaults to all *.json files under results/ when present.",
+        help="JSON files to parse. Defaults to all *.json files under results/<device>/throughput/ when present.",
     )
     parser.add_argument(
         "-o",
@@ -350,7 +350,7 @@ def default_json_paths() -> list[Path]:
 
     results_dir = Path.cwd() / "results"
     if results_dir.exists():
-        return sorted(results_dir.rglob("*.json"))
+        return sorted(results_dir.glob("*/throughput/*.json"))
 
     return sorted(Path.cwd().glob("*.json"))
 
