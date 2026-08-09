@@ -80,25 +80,6 @@ def parse_run_values(path: Path) -> tuple[int | None, int | None, int | None]:
     )
 
 
-def maximum_memory_utilization(gpu_csv_path: Path) -> float | None:
-    if not gpu_csv_path.exists():
-        return None
-
-    values: list[float] = []
-    with gpu_csv_path.open("r", encoding="utf-8-sig", newline="") as file:
-        reader = csv.DictReader(file, skipinitialspace=True)
-        for row in reader:
-            value = row.get("memory_utilization_percent")
-            if value is None:
-                continue
-            try:
-                values.append(float(value))
-            except ValueError:
-                continue
-
-    return max(values) if values else None
-
-
 def read_csv_dicts(csv_path: Path) -> list[dict[str, str]]:
     with csv_path.open("r", encoding="utf-8-sig", newline="") as file:
         reader = csv.DictReader(file, skipinitialspace=True)
@@ -128,7 +109,6 @@ def run_rows_from_manifest(prefill_dir: Path, runs_csv_path: Path) -> list[RunRo
 
     for manifest_row in read_csv_dicts(runs_csv_path):
         json_path = resolve_run_path(prefill_dir, manifest_row["bench_json"])
-        gpu_csv_path = resolve_run_path(prefill_dir, manifest_row["gpu_csv"])
         if not json_path.exists():
             continue
 
@@ -149,9 +129,7 @@ def run_rows_from_manifest(prefill_dir: Path, runs_csv_path: Path) -> list[RunRo
                     "ubatch_size": ubatch_size,
                     "avg_ts": float(json_row["avg_ts"]),
                     "stddev_ts": float(stddev_ts),
-                    "max_memory_utilization": maximum_memory_utilization(gpu_csv_path),
                     "json_path": json_path,
-                    "gpu_csv_path": gpu_csv_path,
                 }
             )
 
@@ -163,7 +141,6 @@ def run_rows_from_json_files(prefill_dir: Path) -> list[RunRow]:
 
     for json_path in sorted(prefill_dir.glob("*.json")):
         prompt_from_name, batch_from_name, ubatch_from_name = parse_run_values(json_path)
-        gpu_csv_path = json_path.with_suffix(".gpu.csv")
 
         for json_row in load_json_rows(json_path):
             samples_ts = [float(value) for value in json_row.get("samples_ts", [])]
@@ -179,9 +156,7 @@ def run_rows_from_json_files(prefill_dir: Path) -> list[RunRow]:
                     "ubatch_size": int(json_row.get("n_ubatch") or ubatch_from_name),
                     "avg_ts": float(json_row["avg_ts"]),
                     "stddev_ts": float(stddev_ts),
-                    "max_memory_utilization": maximum_memory_utilization(gpu_csv_path),
                     "json_path": json_path,
-                    "gpu_csv_path": gpu_csv_path,
                 }
             )
 
