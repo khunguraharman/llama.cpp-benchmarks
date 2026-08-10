@@ -1,10 +1,8 @@
 """Plot maximum GPU memory usage summaries for benchmark runs.
 
-Creates four plots:
-1. prefill max memory vs prompt size, grouped by constant n_batch
-2. prefill max memory vs prompt size, grouped by constant n_ubatch
-3. throughput-batch max memory vs generated tokens, grouped by constant n_batch
-4. throughput-batch max memory vs generated tokens, grouped by constant n_ubatch
+Creates two plots per model family:
+1. prefill max memory vs prompt size, grouped by constant n_ubatch
+2. throughput-batch max memory vs generated tokens, grouped by constant n_ubatch
 """
 
 from __future__ import annotations
@@ -160,14 +158,19 @@ def plot_grouped_summary(
     x_label: str,
     group_key: str,
     group_label: str,
+    secondary_group_key: str,
+    secondary_group_label: str,
 ) -> None:
-    fig, ax = plt.subplots(figsize=(13, 8))
+    fig, ax = plt.subplots(figsize=(12, 6.5))
 
-    grouped_rows: dict[tuple[str, int], list[RunRow]] = defaultdict(list)
+    grouped_rows: dict[tuple[int, int], list[RunRow]] = defaultdict(list)
     for row in rows:
-        grouped_rows[(str(row["model_family"]), int(row[group_key]))].append(row)
+        group_values = (int(row[group_key]), int(row[secondary_group_key]))
+        grouped_rows[group_values].append(row)
 
-    for index, ((model_family, group_value), series_rows) in enumerate(sorted(grouped_rows.items())):
+    for index, ((group_value, secondary_group_value), series_rows) in enumerate(
+        sorted(grouped_rows.items())
+    ):
         points = average_duplicate_points(series_rows, x_key)
         if not points:
             continue
@@ -180,15 +183,18 @@ def plot_grouped_summary(
             marker=MARKERS[index % len(MARKERS)],
             linewidth=1.4,
             markersize=5,
-            label=f"{model_family}, {group_label}={group_value}",
+            label=(
+                f"{group_label}={group_value}, "
+                f"{secondary_group_label}={secondary_group_value}"
+            ),
         )
 
     ax.set_title(title)
     ax.set_xlabel(x_label)
     ax.set_ylabel("Maximum GPU memory used (MiB)")
     ax.grid(True, alpha=0.3)
-    ax.legend(fontsize="x-small", ncols=2, loc="center left", bbox_to_anchor=(1.01, 0.5))
-    fig.subplots_adjust(right=0.62)
+    ax.legend(fontsize="small", loc="center left", bbox_to_anchor=(1.01, 0.5))
+    fig.tight_layout()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path, dpi=200)
     plt.close(fig)
@@ -212,54 +218,65 @@ def save_summary_plots(
     ]
 
     output_dir = output_dir_for(output_root, device)
-    plots = [
+    plot_specs = [
         (
             prefill_rows,
-            output_dir / "prefill_max_memory_vs_prompt_by_batch_size.png",
-            "Prefill: maximum GPU memory usage vs prompt size by batch size",
-            "prompt_tokens",
-            "Prompt tokens",
-            "batch_size",
-            "n_batch",
-        ),
-        (
-            prefill_rows,
-            output_dir / "prefill_max_memory_vs_prompt_by_ubatch_size.png",
-            "Prefill: maximum GPU memory usage vs prompt size by microbatch size",
+            "prefill_max_memory_vs_prompt_by_ubatch_size.png",
+            "Prefill maximum GPU memory usage vs prompt size by microbatch size",
             "prompt_tokens",
             "Prompt tokens",
             "ubatch_size",
             "n_ubatch",
-        ),
-        (
-            throughput_rows,
-            output_dir / "throughput_batch_max_memory_vs_generated_tokens_by_batch_size.png",
-            "Throughput batch: maximum GPU memory usage vs generated tokens by batch size",
-            "generated_tokens",
-            "Generated tokens",
             "batch_size",
             "n_batch",
         ),
         (
             throughput_rows,
-            output_dir / "throughput_batch_max_memory_vs_generated_tokens_by_ubatch_size.png",
-            "Throughput batch: maximum GPU memory usage vs generated tokens by microbatch size",
+            "throughput_batch_max_memory_vs_generated_tokens_by_ubatch_size.png",
+            "Throughput batch maximum GPU memory usage vs generated tokens by microbatch size",
             "generated_tokens",
             "Generated tokens",
             "ubatch_size",
             "n_ubatch",
+            "batch_size",
+            "n_batch",
         ),
     ]
 
     saved_paths: list[Path] = []
-    for rows, output_path, title, x_key, x_label, group_key, group_label in plots:
+    for (
+        rows,
+        filename,
+        title,
+        x_key,
+        x_label,
+        group_key,
+        group_label,
+        secondary_group_key,
+        secondary_group_label,
+    ) in plot_specs:
         if not rows:
-            print(f"No rows available for {output_path.name}", flush=True)
+            print(f"No rows available for {filename}", flush=True)
             continue
 
-        print(f"Saving {output_path}", flush=True)
-        plot_grouped_summary(rows, output_path, title, x_key, x_label, group_key, group_label)
-        saved_paths.append(output_path)
+        model_families = sorted({str(row["model_family"]) for row in rows})
+        for model_family in model_families:
+            model_rows = [row for row in rows if str(row["model_family"]) == model_family]
+            output_path = output_dir / f"{slugify(model_family)}_{filename}"
+            model_title = f"{model_family}: {title}"
+            print(f"Saving {output_path}", flush=True)
+            plot_grouped_summary(
+                model_rows,
+                output_path,
+                model_title,
+                x_key,
+                x_label,
+                group_key,
+                group_label,
+                secondary_group_key,
+                secondary_group_label,
+            )
+            saved_paths.append(output_path)
 
     return saved_paths
 

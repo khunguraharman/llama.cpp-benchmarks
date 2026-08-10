@@ -1,8 +1,9 @@
 """Plot llama.cpp prefill benchmark results.
 
 The script reads results/<device>/prefill-bench-results and creates one prefill
-tokens-per-second plot for every available n_batch size. Each plot includes a
-series for every n_ubatch size available at that n_batch size.
+tokens-per-second plot for every model family. Each plot includes a series for
+every available n_ubatch size, even when larger n_ubatch values required a
+larger n_batch setting for the benchmark run.
 """
 
 from __future__ import annotations
@@ -196,15 +197,15 @@ def group_rows_by_model(rows: list[RunRow]) -> dict[str, list[RunRow]]:
     return dict(grouped_rows)
 
 
-def choose_series(rows: list[RunRow], batch_size: int) -> SeriesRows:
+def choose_series(rows: list[RunRow], batch_size: int | None = None) -> SeriesRows:
     rows_by_pair: SeriesRows = defaultdict(list)
     for row in rows:
-        if row["batch_size"] == batch_size:
+        if batch_size is None or row["batch_size"] == batch_size:
             rows_by_pair[(row["batch_size"], row["ubatch_size"])].append(row)
 
     return {
         pair: rows_by_pair[pair]
-        for pair in sorted(rows_by_pair, key=lambda pair: pair[1])
+        for pair in sorted(rows_by_pair, key=lambda pair: (pair[1], pair[0]))
     }
 
 
@@ -239,7 +240,11 @@ def plot_metric(
 ) -> None:
     fig, ax = plt.subplots(figsize=(11, 7))
 
-    for index, ((_batch_size, ubatch_size), rows) in enumerate(series_rows.items()):
+    ubatch_counts: dict[int, int] = defaultdict(int)
+    for _batch_size, ubatch_size in series_rows:
+        ubatch_counts[ubatch_size] += 1
+
+    for index, ((batch_size, ubatch_size), rows) in enumerate(series_rows.items()):
         averaged_rows = average_duplicate_prompt_rows(rows, metric_key)
         if not averaged_rows:
             continue
@@ -247,6 +252,8 @@ def plot_metric(
         x_values = [row["prompt_tokens"] for row in averaged_rows]
         y_values = [row[metric_key] for row in averaged_rows]
         label = f"ubatch={ubatch_size}"
+        if ubatch_counts[ubatch_size] > 1:
+            label = f"batch={batch_size}, ubatch={ubatch_size}"
 
         if include_error_bars:
             y_errors = [row["stddev_ts"] for row in averaged_rows]
@@ -357,24 +364,42 @@ def save_plots(
 
     for model_family, model_rows in sorted(group_rows_by_model(rows).items()):
         model_slug = slugify(model_family)
-        available_batch_sizes = sorted({int(row["batch_size"]) for row in model_rows})
         if requested_batch_sizes:
+            available_batch_sizes = sorted({int(row["batch_size"]) for row in model_rows})
             requested = set(requested_batch_sizes)
             batch_sizes = [size for size in available_batch_sizes if size in requested]
-        else:
-            batch_sizes = available_batch_sizes
 
         y_limits = metric_limits(model_rows, "avg_ts", include_error_bars=True)
-        for batch_size in batch_sizes:
-            series_rows = choose_series(model_rows, batch_size)
-            if not series_rows:
-                continue
+        if requested_batch_sizes:
+            for batch_size in batch_sizes:
+                series_rows = choose_series(model_rows, batch_size)
+                if not series_rows:
+                    continue
 
-            speed_path = output_dir / f"{model_slug}_prefill_tokens_per_second_b{batch_size}.png"
+                speed_path = output_dir / f"{model_slug}_prefill_tokens_per_second_b{batch_size}.png"
+                plot_metric(
+                    series_rows,
+                    speed_path,
+                    f"{model_family}: prefill tokens per second (batch={batch_size})",
+                    "avg_ts",
+                    "Tokens per second (+/- 1 std dev)",
+                    include_error_bars=True,
+                    y_limits=y_limits,
+                )
+                saved_paths.append(speed_path)
+
+            continue
+
+        series_rows = choose_series(model_rows)
+        if series_rows:
+            batch_sizes = sorted({batch_size for batch_size, _ubatch_size in series_rows})
+            batch_label = ", ".join(str(batch_size) for batch_size in batch_sizes)
+
+            speed_path = output_dir / f"{model_slug}_prefill_tokens_per_second.png"
             plot_metric(
                 series_rows,
                 speed_path,
-                f"{model_family}: prefill tokens per second (batch={batch_size})",
+                f"{model_family}: prefill tokens per second (batch={batch_label})",
                 "avg_ts",
                 "Tokens per second (+/- 1 std dev)",
                 include_error_bars=True,
