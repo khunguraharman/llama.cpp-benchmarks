@@ -18,6 +18,8 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 
+from platform_paths import result_directory, results_root
+
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*", "<", ">", "h", "8"]
 RUN_NAME_RE = re.compile(r"_p(?P<prompt>\d+)_b(?P<batch>\d+)_ub(?P<ubatch>\d+)_n(?P<gen>\d+)_")
@@ -237,7 +239,7 @@ def plot_model_family(model_family: str, model_rows: list[RunRow], output_path: 
 
 
 def output_dir_for(results_dir: Path, output_root: Path) -> Path:
-    cwd_results = Path.cwd() / "results"
+    cwd_results = results_root()
     try:
         relative_path = results_dir.resolve().relative_to(cwd_results.resolve())
     except ValueError:
@@ -296,8 +298,11 @@ def expand_result_dirs(result_dirs: list[Path]) -> list[Path]:
 
 
 def default_result_dirs() -> list[Path]:
-    results_dir = Path.cwd() / "results"
+    results_dir = result_directory()
     if results_dir.exists():
+        if results_dir.name != "results":
+            throughput_dir = results_dir / "throughput-batch-bench-results"
+            return expand_result_dirs([throughput_dir]) if throughput_dir.is_dir() else []
         return expand_result_dirs(
             sorted(path for path in results_dir.glob("*/throughput-batch-bench-results") if path.is_dir())
         )

@@ -19,6 +19,8 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 
+from platform_paths import result_directory, results_root
+
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*", "<", ">", "h", "8"]
 RUN_NAME_RE = re.compile(r"_p(?P<prompt>\d+)_b(?P<batch>\d+)_ub(?P<ubatch>\d+)_")
@@ -330,15 +332,18 @@ def metric_limits(
 
 
 def default_prefill_dirs() -> list[Path]:
-    results_dir = Path.cwd() / "results"
+    results_dir = result_directory()
     if results_dir.exists():
+        if results_dir.name != "results":
+            prefill_dir = results_dir / "prefill-bench-results"
+            return [prefill_dir] if prefill_dir.is_dir() else []
         return sorted(path for path in results_dir.glob("*/prefill-bench-results") if path.is_dir())
 
     return [Path.cwd()]
 
 
 def prefill_output_dir(prefill_dir: Path, output_dir: Path) -> Path:
-    results_dir = Path.cwd() / "results"
+    results_dir = results_root()
     try:
         relative_path = prefill_dir.resolve().relative_to(results_dir.resolve())
     except ValueError:

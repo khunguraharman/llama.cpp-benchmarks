@@ -21,6 +21,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+from platform_paths import device_name, result_directory
+
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*", "<", ">", "h", "8"]
 RUN_NAME_RE = re.compile(r"_p(?P<prompt>\d+)_b(?P<batch>\d+)_ub(?P<ubatch>\d+)_n(?P<gen>\d+)_")
@@ -282,17 +284,21 @@ def save_summary_plots(
 
 
 def parse_args() -> argparse.Namespace:
+    selected_results_dir = result_directory()
+    if selected_results_dir.name == "results":
+        selected_results_dir = selected_results_dir / device_name()
+
     parser = argparse.ArgumentParser(description="Plot max GPU memory usage benchmark summaries.")
     parser.add_argument(
         "--prefill-dir",
         type=Path,
-        default=Path("results/nvidia-rtx-3080/prefill-bench-results"),
+        default=selected_results_dir / "prefill-bench-results",
         help="Prefill result directory.",
     )
     parser.add_argument(
         "--throughput-batch-dir",
         type=Path,
-        default=Path("results/nvidia-rtx-3080/throughput-batch-bench-results"),
+        default=selected_results_dir / "throughput-batch-bench-results",
         help="Throughput batch result directory.",
     )
     parser.add_argument(
@@ -304,7 +310,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--device",
-        default="nvidia-rtx-3080",
+        default=device_name(),
         help="Device name used in the output path.",
     )
     return parser.parse_args()

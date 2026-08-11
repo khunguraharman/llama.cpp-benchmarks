@@ -22,6 +22,8 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 
+from platform_paths import result_directory, results_root
+
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*", "<", ">", "h", "8"]
 
@@ -328,7 +330,7 @@ def parse_args() -> argparse.Namespace:
         "json_files",
         nargs="*",
         type=Path,
-        help="JSON files to parse. Defaults to all *.json files under results/<device>/throughput/ when present.",
+        help="JSON files to parse. Defaults to all *.json files in the current device's throughput results.",
     )
     parser.add_argument(
         "-o",
@@ -348,9 +350,18 @@ def parse_args() -> argparse.Namespace:
 def default_json_paths() -> list[Path]:
     """Find benchmark JSON files using the repository's results folder layout."""
 
-    results_dir = Path.cwd() / "results"
+    results_dir = result_directory()
     if results_dir.exists():
-        return sorted(results_dir.glob("*/throughput/*.json"))
+        if results_dir.name == "results":
+            return sorted(results_dir.glob("*/throughput/*.json"))
+
+        throughput_paths = sorted((results_dir / "throughput").glob("*.json"))
+        if throughput_paths:
+            return throughput_paths
+
+        # Also accept the older macOS layout where files lived directly in the
+        # device result directory.
+        return sorted(results_dir.glob("*.json"))
 
     return sorted(Path.cwd().glob("*.json"))
 
@@ -358,7 +369,7 @@ def default_json_paths() -> list[Path]:
 def device_plot_dir(json_path: Path, output_dir: Path) -> Path:
     """Map result files under results/<device>/ to benchmark_plots/<device>/."""
 
-    results_dir = Path.cwd() / "results"
+    results_dir = results_root()
     try:
         relative_path = json_path.resolve().relative_to(results_dir.resolve())
     except ValueError:
@@ -414,6 +425,9 @@ def save_plots(json_paths: list[Path], output_dir: Path) -> list[Path]:
 def main() -> None:
     args = parse_args()
     json_paths = args.json_files or default_json_paths()
+    if not json_paths:
+        raise SystemExit(f"No benchmark JSON files found under {result_directory()}")
+
     saved_paths: list[Path] = []
 
     for output_dir, grouped_json_paths in sorted(json_paths_by_output_dir(json_paths, args.output_dir).items()):
