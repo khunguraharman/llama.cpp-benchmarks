@@ -20,6 +20,12 @@ from typing import Any
 import matplotlib.pyplot as plt
 
 from platform_paths import result_directory, results_root
+from plot_style import (
+    apply_dashboard_style,
+    save_dashboard_figure,
+    set_dashboard_title,
+    style_dashboard_legend,
+)
 
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*", "<", ">", "h", "8"]
@@ -241,6 +247,7 @@ def plot_metric(
     y_limits: tuple[float, float] | None = None,
 ) -> None:
     fig, ax = plt.subplots(figsize=(11, 7))
+    apply_dashboard_style(fig, ax)
 
     ubatch_counts: dict[int, int] = defaultdict(int)
     for _batch_size, ubatch_size in series_rows:
@@ -296,15 +303,14 @@ def plot_metric(
                 label=label,
             )
 
-    ax.set_title(title)
+    set_dashboard_title(ax, title)
     ax.set_xlabel("Prompt tokens")
     ax.set_ylabel(y_label)
     if y_limits is not None:
         ax.set_ylim(*y_limits)
-    ax.grid(True, alpha=0.3)
-    ax.legend(title="Microbatch size", fontsize="small")
-    fig.tight_layout()
-    fig.savefig(output_path, dpi=200)
+    style_dashboard_legend(ax, title="Microbatch size", fontsize="small")
+    save_dashboard_figure(fig, ax, output_path)
+    plt.close(fig)
 
 
 def metric_limits(

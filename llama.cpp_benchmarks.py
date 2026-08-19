@@ -23,6 +23,12 @@ from typing import Any
 import matplotlib.pyplot as plt
 
 from platform_paths import result_directory, results_root
+from plot_style import (
+    apply_dashboard_style,
+    save_dashboard_figure,
+    set_dashboard_title,
+    style_dashboard_legend,
+)
 
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*", "<", ">", "h", "8"]
@@ -208,6 +214,7 @@ def plot_generation_speed(rows_by_variation: dict[str, list[dict[str, float]]], 
         raise SystemExit("No benchmark rows found to plot.")
 
     fig, ax = plt.subplots(figsize=(11, 7))
+    apply_dashboard_style(fig, ax)
 
     for index, (variation_name, rows) in enumerate(sorted(rows_by_variation.items())):
         rows = sorted(rows, key=lambda item: item["n_gen"])
@@ -227,13 +234,12 @@ def plot_generation_speed(rows_by_variation: dict[str, list[dict[str, float]]], 
             label=variation_name,
         )
 
-    ax.set_title(f"{family_name}: generation speed")
+    set_dashboard_title(ax, f"{family_name}: generation speed")
     ax.set_xlabel("Generated tokens")
     ax.set_ylabel("Average tokens per second")
-    ax.grid(True, alpha=0.3)
-    ax.legend(title="Quantization", fontsize="small")
-    fig.tight_layout()
-    fig.savefig(output_path, dpi=200)
+    style_dashboard_legend(ax, title="Quantization", fontsize="small", ncols=3)
+    save_dashboard_figure(fig, ax, output_path)
+    plt.close(fig)
 
 
 def plot_p99_time_between_tokens(
@@ -245,6 +251,7 @@ def plot_p99_time_between_tokens(
         raise SystemExit("No time-between-tokens rows found to plot.")
 
     fig, ax = plt.subplots(figsize=(11, 7))
+    apply_dashboard_style(fig, ax)
 
     for index, (variation_name, rows) in enumerate(sorted(rows_by_variation.items())):
         rows = sorted(rows, key=lambda item: item["n_gen"])
@@ -261,13 +268,12 @@ def plot_p99_time_between_tokens(
             label=variation_name,
         )
 
-    ax.set_title(title)
+    set_dashboard_title(ax, title)
     ax.set_xlabel("Generated tokens")
     ax.set_ylabel("P99 time between tokens (ms/token)")
-    ax.grid(True, alpha=0.3)
-    ax.legend(title="Quantization", fontsize="small")
-    fig.tight_layout()
-    fig.savefig(output_path, dpi=200)
+    style_dashboard_legend(ax, title="Quantization", fontsize="small", ncols=3)
+    save_dashboard_figure(fig, ax, output_path)
+    plt.close(fig)
 
 
 def plot_ttft(rows_by_variation: dict[str, list[dict[str, float]]], output_path: Path, title: str) -> None:
@@ -277,6 +283,7 @@ def plot_ttft(rows_by_variation: dict[str, list[dict[str, float]]], output_path:
         raise SystemExit("No TTFT rows found to plot.")
 
     fig, ax = plt.subplots(figsize=(11, 7))
+    apply_dashboard_style(fig, ax)
 
     for index, (variation_name, rows) in enumerate(sorted(rows_by_variation.items())):
         rows = sorted(rows, key=lambda item: item["n_gen"])
@@ -296,13 +303,12 @@ def plot_ttft(rows_by_variation: dict[str, list[dict[str, float]]], output_path:
             label=variation_name,
         )
 
-    ax.set_title(title)
+    set_dashboard_title(ax, title)
     ax.set_xlabel("Generated tokens")
     ax.set_ylabel("Estimated time to first token (ms)")
-    ax.grid(True, alpha=0.3)
-    ax.legend(title="Quantization", fontsize="small")
-    fig.tight_layout()
-    fig.savefig(output_path, dpi=200)
+    style_dashboard_legend(ax, title="Quantization", fontsize="small", ncols=3)
+    save_dashboard_figure(fig, ax, output_path)
+    plt.close(fig)
 
 
 def plot_all_families(

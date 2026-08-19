@@ -22,6 +22,12 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from platform_paths import device_name, result_directory
+from plot_style import (
+    apply_dashboard_style,
+    save_dashboard_figure,
+    set_dashboard_title,
+    style_dashboard_legend,
+)
 
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*", "<", ">", "h", "8"]
@@ -164,6 +170,7 @@ def plot_grouped_summary(
     secondary_group_label: str,
 ) -> None:
     fig, ax = plt.subplots(figsize=(12, 6.5))
+    apply_dashboard_style(fig, ax)
 
     grouped_rows: dict[tuple[int, int], list[RunRow]] = defaultdict(list)
     for row in rows:
@@ -191,14 +198,12 @@ def plot_grouped_summary(
             ),
         )
 
-    ax.set_title(title)
+    set_dashboard_title(ax, title)
     ax.set_xlabel(x_label)
     ax.set_ylabel("Maximum GPU memory used (MiB)")
-    ax.grid(True, alpha=0.3)
-    ax.legend(fontsize="small", loc="center left", bbox_to_anchor=(1.01, 0.5))
-    fig.tight_layout()
+    style_dashboard_legend(ax, fontsize="small", loc="center left", bbox_to_anchor=(1.01, 0.5))
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=200)
+    save_dashboard_figure(fig, ax, output_path)
     plt.close(fig)
 
 

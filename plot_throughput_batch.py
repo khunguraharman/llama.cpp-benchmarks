@@ -19,6 +19,12 @@ from typing import Any
 import matplotlib.pyplot as plt
 
 from platform_paths import result_directory, results_root
+from plot_style import (
+    apply_dashboard_style,
+    save_dashboard_figure,
+    set_dashboard_title,
+    style_dashboard_legend,
+)
 
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*", "<", ">", "h", "8"]
@@ -185,6 +191,7 @@ def y_limits(rows: list[RunRow]) -> tuple[float, float]:
 
 def plot_model_family(model_family: str, model_rows: list[RunRow], output_path: Path, sweep: Sweep) -> None:
     fig, ax = plt.subplots(figsize=(11, 7))
+    apply_dashboard_style(fig, ax)
 
     constant_values = sorted({int(row[sweep.constant_key]) for row in model_rows})
     series_values = sorted({int(row[sweep.key]) for row in model_rows})
@@ -216,11 +223,10 @@ def plot_model_family(model_family: str, model_rows: list[RunRow], output_path: 
             capsize=4,
         )
 
-    ax.set_title(f"{model_family}: throughput by generated tokens ({sweep.slug} sweep)")
+    set_dashboard_title(ax, f"{model_family}: throughput by generated tokens ({sweep.slug} sweep)")
     ax.set_xlabel("Tokens generated")
     ax.set_ylabel("Tokens per second (+/- 1 std dev)")
     ax.set_ylim(*y_limits(model_rows))
-    ax.grid(True, alpha=0.3)
     if len(constant_values) == 1:
         ax.text(
             0.99,
@@ -232,9 +238,8 @@ def plot_model_family(model_family: str, model_rows: list[RunRow], output_path: 
             fontsize="small",
             alpha=0.75,
         )
-    ax.legend(title=sweep.label, fontsize="small")
-    fig.tight_layout()
-    fig.savefig(output_path, dpi=200)
+    style_dashboard_legend(ax, title=sweep.label, fontsize="small")
+    save_dashboard_figure(fig, ax, output_path)
     plt.close(fig)
 
 

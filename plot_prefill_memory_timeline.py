@@ -17,6 +17,12 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from platform_paths import result_directory, results_root
+from plot_style import (
+    apply_dashboard_style,
+    save_dashboard_figure,
+    set_dashboard_title,
+    style_dashboard_legend,
+)
 
 
 RUN_NAME_RE = re.compile(r"_p(?P<prompt>\d+)_b(?P<batch>\d+)_ub(?P<ubatch>\d+)_")
@@ -143,6 +149,7 @@ def plot_prefill_memory_timelines(
 ) -> bool:
     figure_height = max(8.0, min(18.0, 4.5 + len(csv_paths) * 0.12))
     fig, ax = plt.subplots(figsize=(14, figure_height))
+    apply_dashboard_style(fig, ax)
     plotted_count = 0
 
     for csv_path in csv_paths:
@@ -167,11 +174,11 @@ def plot_prefill_memory_timelines(
     if page_number is not None and page_count is not None and page_count > 1:
         title = f"{title} ({page_number}/{page_count})"
 
-    ax.set_title(title)
+    set_dashboard_title(ax, title)
     ax.set_xlabel("Time since logging started (ms)")
     ax.set_ylabel("Memory utilization (%)")
-    ax.grid(True, alpha=0.3)
-    ax.legend(
+    style_dashboard_legend(
+        ax,
         title="Run parameters",
         fontsize="xx-small",
         ncols=2,
@@ -182,7 +189,7 @@ def plot_prefill_memory_timelines(
     fig.subplots_adjust(right=0.58)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_path, dpi=200)
+    save_dashboard_figure(fig, ax, output_path, use_tight_layout=False)
     plt.close(fig)
     return True
 

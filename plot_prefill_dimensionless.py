@@ -30,6 +30,13 @@ from plot_prefill_benchmarks import (
     prefill_output_dir,
     slugify,
 )
+from plot_style import (
+    MUTED_TEXT_COLOR,
+    apply_dashboard_style,
+    save_dashboard_figure,
+    set_dashboard_title,
+    style_dashboard_legend,
+)
 
 
 def add_dimensionless_values(rows: list[RunRow], tps_reference: float) -> list[RunRow]:
@@ -76,6 +83,7 @@ def plot_dimensionless_prefill(
     tps_reference: float,
 ) -> None:
     fig, ax = plt.subplots(figsize=(11, 7))
+    apply_dashboard_style(fig, ax)
 
     for index, ((batch_size, ubatch_size), rows) in enumerate(series_rows.items()):
         averaged_rows = average_duplicate_x_rows(rows)
@@ -113,12 +121,11 @@ def plot_dimensionless_prefill(
             capsize=4,
         )
 
-    ax.axhline(1.0, color="black", linewidth=1.0, alpha=0.35, linestyle="--")
-    ax.set_title(title)
+    ax.axhline(1.0, color=MUTED_TEXT_COLOR, linewidth=1.0, alpha=0.65, linestyle="--")
+    set_dashboard_title(ax, title)
     ax.set_xlabel("Prompt tokens / n_batch")
     ax.set_ylabel("Prefill throughput / peak observed prefill throughput")
-    ax.grid(True, alpha=0.3)
-    ax.legend(title="Batch / microbatch", fontsize="small")
+    style_dashboard_legend(ax, title="Batch / microbatch", fontsize="small")
     ax.text(
         0.99,
         0.02,
@@ -129,8 +136,7 @@ def plot_dimensionless_prefill(
         fontsize="small",
         alpha=0.75,
     )
-    fig.tight_layout()
-    fig.savefig(output_path, dpi=200)
+    save_dashboard_figure(fig, ax, output_path)
     plt.close(fig)
 
 
