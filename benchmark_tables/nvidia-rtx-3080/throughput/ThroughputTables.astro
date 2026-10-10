@@ -1,0 +1,129 @@
+<div class="throughput-tables">
+  <p>NVIDIA GeForce RTX 3080. Throughput in tokens/s, mean &plusmn; one standard deviation.</p>
+  <section>
+    <h2>Llama 3.2 3B</h2>
+    <div class="table-scroll">
+      <table>
+        <caption>Llama 3.2 3B: generation throughput</caption>
+        <thead><tr><th scope="col">Quantization</th>
+          <th scope="col">3,277 generated tokens</th>
+          <th scope="col">6,554 generated tokens</th>
+          <th scope="col">9,830 generated tokens</th>
+          <th scope="col">13,107 generated tokens</th>
+          <th scope="col">Runs per cell</th>
+        </tr></thead>
+        <tbody>
+          <tr><th scope="row">Q5_K_M</th>
+            <td>199.22 &plusmn; 1.34</td>
+            <td>190.19 &plusmn; 0.08</td>
+            <td>180.84 &plusmn; 0.13</td>
+            <td>172.64 &plusmn; 0.03</td>
+            <td>100</td>
+          </tr>
+          <tr><th scope="row">Q6_K</th>
+            <td>179.97 &plusmn; 0.11</td>
+            <td>171.63 &plusmn; 0.19</td>
+            <td>164.24 &plusmn; 0.04</td>
+            <td>157.29 &plusmn; 0.51</td>
+            <td>100</td>
+          </tr>
+          <tr><th scope="row">Q8_0</th>
+            <td>154.80 &plusmn; 1.32</td>
+            <td>148.65 &plusmn; 0.49</td>
+            <td>143.30 &plusmn; 0.02</td>
+            <td>137.90 &plusmn; 0.05</td>
+            <td>100</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <section>
+    <h2>Phi-3.5 Mini</h2>
+    <div class="table-scroll">
+      <table>
+        <caption>Phi-3.5 Mini: generation throughput</caption>
+        <thead><tr><th scope="col">Quantization</th>
+          <th scope="col">3,277 generated tokens</th>
+          <th scope="col">6,554 generated tokens</th>
+          <th scope="col">9,830 generated tokens</th>
+          <th scope="col">13,107 generated tokens</th>
+          <th scope="col">Runs per cell</th>
+        </tr></thead>
+        <tbody>
+          <tr><th scope="row">Q5_K_M</th>
+            <td>147.50 &plusmn; 1.47</td>
+            <td>123.75 &plusmn; 0.04</td>
+            <td>105.79 &plusmn; 0.23</td>
+            <td>92.08 &plusmn; 0.01</td>
+            <td>100</td>
+          </tr>
+          <tr><th scope="row">Q6_K</th>
+            <td>137.24 &plusmn; 0.02</td>
+            <td>116.31 &plusmn; 0.02</td>
+            <td>100.54 &plusmn; 0.03</td>
+            <td>88.19 &plusmn; 0.01</td>
+            <td>100</td>
+          </tr>
+          <tr><th scope="row">Q8_0</th>
+            <td>119.51 &plusmn; 0.01</td>
+            <td>103.13 &plusmn; 0.27</td>
+            <td>90.41 &plusmn; 0.05</td>
+            <td>80.47 &plusmn; 0.19</td>
+            <td>100</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <section>
+    <h2>Qwen3 4B</h2>
+    <div class="table-scroll">
+      <table>
+        <caption>Qwen3 4B: generation throughput</caption>
+        <thead><tr><th scope="col">Quantization</th>
+          <th scope="col">3,277 generated tokens</th>
+          <th scope="col">6,554 generated tokens</th>
+          <th scope="col">9,830 generated tokens</th>
+          <th scope="col">13,107 generated tokens</th>
+          <th scope="col">Runs per cell</th>
+        </tr></thead>
+        <tbody>
+          <tr><th scope="row">Q5_K_M</th>
+            <td>152.37 &plusmn; 0.47</td>
+            <td>144.74 &plusmn; 0.04</td>
+            <td>138.57 &plusmn; 0.21</td>
+            <td>132.34 &plusmn; 0.05</td>
+            <td>100</td>
+          </tr>
+          <tr><th scope="row">Q6_K</th>
+            <td>138.78 &plusmn; 0.03</td>
+            <td>132.54 &plusmn; 0.04</td>
+            <td>126.92 &plusmn; 0.03</td>
+            <td>121.72 &plusmn; 0.05</td>
+            <td>100</td>
+          </tr>
+          <tr><th scope="row">Q8_0</th>
+            <td>121.56 &plusmn; 0.24</td>
+            <td>116.69 &plusmn; 0.02</td>
+            <td>111.97 &plusmn; 0.19</td>
+            <td>107.88 &plusmn; 0.01</td>
+            <td>100</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+  <p>Decode-only benchmarks with zero prompt tokens. Values use the benchmark's reported mean and standard deviation across 100 repetitions per cell; &plusmn; is not a confidence interval.</p>
+</div>
+
+<style>
+  .throughput-tables { min-width: 0; }
+  section { margin-block: 2rem; }
+  h2 { font-size: 1.25rem; }
+  .table-scroll { max-width: 100%; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  caption { text-align: left; padding-block: 0.5rem; }
+  th, td { padding: 0.75rem; border-bottom: 1px solid currentColor; white-space: nowrap; text-align: right; }
+  th:first-child { text-align: left; }
+</style>

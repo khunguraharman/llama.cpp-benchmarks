@@ -1,0 +1,13 @@
+model,prompt_tokens,batch_size,ubatch_size,n_gen,repetitions,bench_json
+"LLMs/Llama-3.2-3B-Instruct-Q8_0.gguf",512,2048,512,0,100,"prefill-bench-results/Llama-3.2-3B-Instruct-Q8_0_p512_b2048_ub512_n0_r100.json"
+"LLMs/Llama-3.2-3B-Instruct-Q8_0.gguf",512,2048,2048,0,100,"prefill-bench-results/Llama-3.2-3B-Instruct-Q8_0_p512_b2048_ub2048_n0_r100.json"
+"LLMs/Llama-3.2-3B-Instruct-Q8_0.gguf",2048,2048,512,0,100,"prefill-bench-results/Llama-3.2-3B-Instruct-Q8_0_p2048_b2048_ub512_n0_r100.json"
+"LLMs/Llama-3.2-3B-Instruct-Q8_0.gguf",2048,2048,2048,0,100,"prefill-bench-results/Llama-3.2-3B-Instruct-Q8_0_p2048_b2048_ub2048_n0_r100.json"
+"LLMs/Phi-3.5-mini-instruct-Q8_0.gguf",512,2048,512,0,100,"prefill-bench-results/Phi-3.5-mini-instruct-Q8_0_p512_b2048_ub512_n0_r100.json"
+"LLMs/Phi-3.5-mini-instruct-Q8_0.gguf",512,2048,2048,0,100,"prefill-bench-results/Phi-3.5-mini-instruct-Q8_0_p512_b2048_ub2048_n0_r100.json"
+"LLMs/Phi-3.5-mini-instruct-Q8_0.gguf",2048,2048,512,0,100,"prefill-bench-results/Phi-3.5-mini-instruct-Q8_0_p2048_b2048_ub512_n0_r100.json"
+"LLMs/Phi-3.5-mini-instruct-Q8_0.gguf",2048,2048,2048,0,100,"prefill-bench-results/Phi-3.5-mini-instruct-Q8_0_p2048_b2048_ub2048_n0_r100.json"
+"LLMs/Qwen3-4B-Q8_0.gguf",512,2048,512,0,100,"prefill-bench-results/Qwen3-4B-Q8_0_p512_b2048_ub512_n0_r100.json"
+"LLMs/Qwen3-4B-Q8_0.gguf",512,2048,2048,0,100,"prefill-bench-results/Qwen3-4B-Q8_0_p512_b2048_ub2048_n0_r100.json"
+"LLMs/Qwen3-4B-Q8_0.gguf",2048,2048,512,0,100,"prefill-bench-results/Qwen3-4B-Q8_0_p2048_b2048_ub512_n0_r100.json"
+"LLMs/Qwen3-4B-Q8_0.gguf",2048,2048,2048,0,100,"prefill-bench-results/Qwen3-4B-Q8_0_p2048_b2048_ub2048_n0_r100.json"

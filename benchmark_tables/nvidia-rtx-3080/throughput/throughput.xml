@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<throughput device="NVIDIA GeForce RTX 3080" unit="tokens/s">
+  <statistics>Reported avg_ts +/- stddev_ts from llama-bench; one standard deviation across repeated runs, not a confidence interval.</statistics>
+  <model name="Llama 3.2 3B" source="llama-3.2-3B-bench-results.json">
+    <quantization name="Q5_K_M">
+      <measurement generated_tokens="3277" prompt_tokens="0" runs="100" mean="199.220098" stddev="1.335156" />
+      <measurement generated_tokens="6554" prompt_tokens="0" runs="100" mean="190.191023" stddev="0.083193" />
+      <measurement generated_tokens="9830" prompt_tokens="0" runs="100" mean="180.840439" stddev="0.131273" />
+      <measurement generated_tokens="13107" prompt_tokens="0" runs="100" mean="172.640264" stddev="0.03218" />
+    </quantization>
+    <quantization name="Q6_K">
+      <measurement generated_tokens="3277" prompt_tokens="0" runs="100" mean="179.966826" stddev="0.109849" />
+      <measurement generated_tokens="6554" prompt_tokens="0" runs="100" mean="171.6295" stddev="0.186775" />
+      <measurement generated_tokens="9830" prompt_tokens="0" runs="100" mean="164.242727" stddev="0.044801" />
+      <measurement generated_tokens="13107" prompt_tokens="0" runs="100" mean="157.289723" stddev="0.514116" />
+    </quantization>
+    <quantization name="Q8_0">
+      <measurement generated_tokens="3277" prompt_tokens="0" runs="100" mean="154.795296" stddev="1.318447" />
+      <measurement generated_tokens="6554" prompt_tokens="0" runs="100" mean="148.646041" stddev="0.488986" />
+      <measurement generated_tokens="9830" prompt_tokens="0" runs="100" mean="143.298729" stddev="0.020314" />
+      <measurement generated_tokens="13107" prompt_tokens="0" runs="100" mean="137.90405" stddev="0.04839" />
+    </quantization>
+  </model>
+  <model name="Phi-3.5 Mini" source="phi-3.5-mini-bench-results.json">
+    <quantization name="Q5_K_M">
+      <measurement generated_tokens="3277" prompt_tokens="0" runs="100" mean="147.501331" stddev="1.474748" />
+      <measurement generated_tokens="6554" prompt_tokens="0" runs="100" mean="123.745928" stddev="0.03579" />
+      <measurement generated_tokens="9830" prompt_tokens="0" runs="100" mean="105.792255" stddev="0.2342" />
+      <measurement generated_tokens="13107" prompt_tokens="0" runs="100" mean="92.084027" stddev="0.008687" />
+    </quantization>
+    <quantization name="Q6_K">
+      <measurement generated_tokens="3277" prompt_tokens="0" runs="100" mean="137.235073" stddev="0.020296" />
+      <measurement generated_tokens="6554" prompt_tokens="0" runs="100" mean="116.306141" stddev="0.022943" />
+      <measurement generated_tokens="9830" prompt_tokens="0" runs="100" mean="100.539484" stddev="0.03118" />
+      <measurement generated_tokens="13107" prompt_tokens="0" runs="100" mean="88.19066" stddev="0.010388" />
+    </quantization>
+    <quantization name="Q8_0">
+      <measurement generated_tokens="3277" prompt_tokens="0" runs="100" mean="119.508709" stddev="0.013844" />
+      <measurement generated_tokens="6554" prompt_tokens="0" runs="100" mean="103.125208" stddev="0.273686" />
+      <measurement generated_tokens="9830" prompt_tokens="0" runs="100" mean="90.414633" stddev="0.053677" />
+      <measurement generated_tokens="13107" prompt_tokens="0" runs="100" mean="80.469621" stddev="0.185524" />
+    </quantization>
+  </model>
+  <model name="Qwen3 4B" source="qwen3-4B-bench-results.json">
+    <quantization name="Q5_K_M">
+      <measurement generated_tokens="3277" prompt_tokens="0" runs="100" mean="152.369962" stddev="0.472185" />
+      <measurement generated_tokens="6554" prompt_tokens="0" runs="100" mean="144.735386" stddev="0.036258" />
+      <measurement generated_tokens="9830" prompt_tokens="0" runs="100" mean="138.57442" stddev="0.205093" />
+      <measurement generated_tokens="13107" prompt_tokens="0" runs="100" mean="132.342756" stddev="0.046328" />
+    </quantization>
+    <quantization name="Q6_K">
+      <measurement generated_tokens="3277" prompt_tokens="0" runs="100" mean="138.778796" stddev="0.03136" />
+      <measurement generated_tokens="6554" prompt_tokens="0" runs="100" mean="132.539988" stddev="0.041277" />
+      <measurement generated_tokens="9830" prompt_tokens="0" runs="100" mean="126.924177" stddev="0.034251" />
+      <measurement generated_tokens="13107" prompt_tokens="0" runs="100" mean="121.723868" stddev="0.048217" />
+    </quantization>
+    <quantization name="Q8_0">
+      <measurement generated_tokens="3277" prompt_tokens="0" runs="100" mean="121.556453" stddev="0.235813" />
+      <measurement generated_tokens="6554" prompt_tokens="0" runs="100" mean="116.69036" stddev="0.023653" />
+      <measurement generated_tokens="9830" prompt_tokens="0" runs="100" mean="111.967208" stddev="0.185509" />
+      <measurement generated_tokens="13107" prompt_tokens="0" runs="100" mean="107.884115" stddev="0.014395" />
+    </quantization>
+  </model>
+</throughput>
