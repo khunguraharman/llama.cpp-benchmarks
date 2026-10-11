@@ -3,6 +3,8 @@
 Creates two plots per model family:
 1. prefill max memory vs prompt size, grouped by constant n_ubatch
 2. throughput-batch max memory vs generated tokens, grouped by constant n_ubatch
+
+Runs with batch_size=4096 are excluded to keep the summaries readable.
 """
 
 from __future__ import annotations
@@ -217,11 +219,13 @@ def save_summary_plots(
     output_root: Path,
     device: str,
 ) -> list[Path]:
-    prefill_rows = load_rows(prefill_dir)
+    prefill_rows = [
+        row for row in load_rows(prefill_dir) if int(row["batch_size"]) != 4096
+    ]
     throughput_rows = [
         row
         for row in load_rows(throughput_batch_dir)
-        if int(row["generated_tokens"]) > 0
+        if int(row["generated_tokens"]) > 0 and int(row["batch_size"]) != 4096
     ]
 
     output_dir = output_dir_for(output_root, device)
