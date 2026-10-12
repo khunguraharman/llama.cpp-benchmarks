@@ -1,10 +1,11 @@
 """Plot maximum GPU memory usage summaries for benchmark runs.
 
-Creates two plots per model family:
+Creates two SVG plots per model family:
 1. prefill max memory vs prompt size, grouped by constant n_ubatch
 2. throughput-batch max memory vs generated tokens, grouped by constant n_ubatch
 
-Runs with batch_size=4096 are excluded to keep the summaries readable.
+Prefill summaries use batch_size=2048; token-generation summaries use
+batch_size=4096 so only n_ubatch varies between series in each plot.
 """
 
 from __future__ import annotations
@@ -24,7 +25,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from platform_paths import device_name, result_directory
-from plot_style import (
+from plot_localai_style import (
     apply_dashboard_style,
     save_dashboard_figure,
     set_dashboard_title,
@@ -194,15 +195,12 @@ def plot_grouped_summary(
             marker=MARKERS[index % len(MARKERS)],
             linewidth=1.4,
             markersize=5,
-            label=(
-                f"{group_label}={group_value}, "
-                f"{secondary_group_label}={secondary_group_value}"
-            ),
+            label=f"{group_label}={group_value}",
         )
 
     set_dashboard_title(ax, title)
     ax.set_xlabel(x_label)
-    ax.set_ylabel("Maximum GPU memory used (MiB)")
+    ax.set_ylabel("Maximum VRAM Utilization [MiB]")
     style_dashboard_legend(ax, fontsize="small", loc="center left", bbox_to_anchor=(1.01, 0.5))
     output_path.parent.mkdir(parents=True, exist_ok=True)
     save_dashboard_figure(fig, ax, output_path)
@@ -220,22 +218,22 @@ def save_summary_plots(
     device: str,
 ) -> list[Path]:
     prefill_rows = [
-        row for row in load_rows(prefill_dir) if int(row["batch_size"]) != 4096
+        row for row in load_rows(prefill_dir) if int(row["batch_size"]) == 2048
     ]
     throughput_rows = [
         row
         for row in load_rows(throughput_batch_dir)
-        if int(row["generated_tokens"]) > 0 and int(row["batch_size"]) != 4096
+        if int(row["generated_tokens"]) > 0 and int(row["batch_size"]) == 4096
     ]
 
     output_dir = output_dir_for(output_root, device)
     plot_specs = [
         (
             prefill_rows,
-            "prefill_max_memory_vs_prompt_by_ubatch_size.png",
-            "Prefill maximum GPU memory usage vs prompt size by microbatch size",
+            "prefill_max_memory_vs_prompt_by_ubatch_size.svg",
+            "Maximum VRAM Utilization During Prefill vs. Prompt Tokens for n_batch = 2048",
             "prompt_tokens",
-            "Prompt tokens",
+            "Prompt Tokens",
             "ubatch_size",
             "n_ubatch",
             "batch_size",
@@ -243,10 +241,10 @@ def save_summary_plots(
         ),
         (
             throughput_rows,
-            "throughput_batch_max_memory_vs_generated_tokens_by_ubatch_size.png",
-            "Throughput batch maximum GPU memory usage vs generated tokens by microbatch size",
+            "throughput_batch_max_memory_vs_generated_tokens_by_ubatch_size.svg",
+            "Maximum VRAM Utilization During Generation vs. Output Tokens for n_batch = 4096",
             "generated_tokens",
-            "Generated tokens",
+            "Generated Tokens",
             "ubatch_size",
             "n_ubatch",
             "batch_size",
