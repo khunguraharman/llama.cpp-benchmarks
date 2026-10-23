@@ -1,0 +1,62 @@
+{
+  "completed_samples": 1,
+  "config": {
+    "bench": "throughput_1k",
+    "category": "low_entropy",
+    "concurrency": 1,
+    "extra_inputs": {
+      "temperature": 0
+    },
+    "model": null,
+    "osl": 2048,
+    "url": "localhost:8080"
+  },
+  "failed_samples": 0,
+  "results": [
+    {
+      "category": "low_entropy",
+      "completion_tokens": 2048,
+      "draft_n": 0,
+      "draft_n_accepted": 0,
+      "error": null,
+      "finish_reason": "length",
+      "id": "2afab7aa17f54849bf304a71cd57a6e6",
+      "latency_s": 18.1854483000061,
+      "ok": true,
+      "predicted_ms": 15883.616,
+      "predicted_per_second": 128.93789424272157,
+      "prompt_ms": 224.943,
+      "prompt_per_second": 17.782282622708863,
+      "prompt_tokens": 1076,
+      "total_tokens": 3124,
+      "turns": 1
+    }
+  ],
+  "selected_samples": 1,
+  "summary": [
+    {
+      "accept_rate": null,
+      "accepted": 0,
+      "avg_latency": 18.1854483000061,
+      "avg_pred_t_s": 128.93789424272157,
+      "avg_prompt_t_s": 17.782282622708863,
+      "category": "low_entropy",
+      "draft_n": 0,
+      "failed": 0,
+      "requests": 1,
+      "turns": 1
+    },
+    {
+      "accept_rate": null,
+      "accepted": 0,
+      "avg_latency": 18.1854483000061,
+      "avg_pred_t_s": 128.93789424272157,
+      "avg_prompt_t_s": 17.782282622708863,
+      "category": "overall",
+      "draft_n": 0,
+      "failed": 0,
+      "requests": 1,
+      "turns": 1
+    }
+  ]
+}

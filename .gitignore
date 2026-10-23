@@ -77,6 +77,7 @@ ipython_config.py
 *.log
 
 # IDEs / editors
+.codex-export/
 .vs/
 .idea/
 .vscode/

@@ -195,18 +195,27 @@ def plot_bench_category(
         averaged_rows = average_duplicate_token_rows(series_rows)
         x_values = [int(row["tokens"]) for row in averaged_rows]
         y_values = [float(row["throughput"]) for row in averaged_rows]
-        ax.scatter(
+        ax.plot(
             x_values,
             y_values,
             marker=MARKERS[index % len(MARKERS)],
-            s=46,
-            label=f"n={mtp_n}",
+            markersize=6,
+            linewidth=1.8,
+            label=f"n_predict={mtp_n}",
         )
 
-    set_dashboard_title(
-        ax,
-        f"{bench} / {category}: accepted-token rate by generated tokens ({token_range_label})",
-    )
+    title = f"{bench} / {category}: accepted-token rate by generated tokens"
+    separator = "\n" if bench == "Speed tests" else " "
+    set_dashboard_title(ax, f"{title}{separator}({token_range_label})")
+    if bench == "Speed tests" and all(
+        len({row["tokens"] for row in rows if row["mtp_n"] == mtp_n}) == 1
+        for mtp_n in mtp_values
+    ):
+        ax.text(
+            0.02, 0.97,
+            "One distinct output length per series; markers summarize repeated samples.",
+            transform=ax.transAxes, va="top", fontsize=9,
+        )
     ax.set_xlabel("Tokens generated")
     ax.set_ylabel(metric_label(metric))
     ax.set_ylim(*y_limits(rows))
@@ -266,6 +275,81 @@ def has_mtp_json_files(path: Path) -> bool:
     return any(path.glob("mtp_n*.json"))
 
 
+def save_speed_weighted_averages(results_dir: Path, output_root: Path, metric: str) -> Path:
+    """Weight each individual sample's accepted-token rate by generated tokens."""
+    groups: dict[tuple[str, str, int, int], list[RunRow]] = defaultdict(list)
+    for row in load_rows(results_dir, metric):
+        if row["bench"] in {"throughput_1k", "throughput_2k"}:
+            groups[(row["bench"], row["category"], row["mtp_n"], row["osl"])].append(row)
+    summaries = []
+    for (bench, category, mtp_n, osl), rows in sorted(groups.items()):
+        total_tokens = sum(row["tokens"] for row in rows)
+        weighted_mean = sum(row["tokens"] * row["throughput"] for row in rows) / total_tokens
+        weighted_stddev = (sum(
+            row["tokens"] * (row["throughput"] - weighted_mean) ** 2 for row in rows
+        ) / total_tokens) ** 0.5
+        summaries.append({
+            "workload": bench,
+            "category": category,
+            "n_predict": mtp_n,
+            "maximum_output_tokens": osl,
+            "samples": len(rows),
+            "total_generated_tokens": total_tokens,
+            "weighted_accepted_tokens_per_second": weighted_mean,
+            "weighted_population_stddev": weighted_stddev,
+        })
+    output_dir = output_dir_for(results_dir, output_root)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / f"speed_weighted_averages_by_workload_osl_{metric}.json"
+    output_path.write_text(json.dumps({
+        "metric": metric,
+        "formula": "sum(completion_tokens * accepted_tokens_per_second) / sum(completion_tokens)",
+        "stddev_formula": "sqrt(sum(completion_tokens * (accepted_tokens_per_second - weighted_mean)^2) / sum(completion_tokens))",
+        "workloads": ["throughput_1k", "throughput_2k"],
+        "results": summaries,
+    }, indent=2) + "\n", encoding="utf-8")
+    report = ["# Speed-test weighted averages", "",
+              "Accepted draft tokens/s using server decode time." if metric == "server" else
+              "Accepted draft tokens/s using end-to-end time.", "",
+              "Each entry is the generated-token-weighted mean ± 1 weighted population standard deviation.",
+              "The standard deviation describes run-to-run spread, not uncertainty in the mean.", ""]
+    for bench in sorted({row["workload"] for row in summaries}):
+        for osl in sorted({row["maximum_output_tokens"] for row in summaries if row["workload"] == bench}):
+            selected = [row for row in summaries if row["workload"] == bench and row["maximum_output_tokens"] == osl]
+            lookup = {(row["n_predict"], row["category"]): row for row in selected}
+            report.extend([f"## {bench} — maximum output {osl}", "",
+                           "| n_predict | High entropy | Mixed | Low entropy |", "|---|---:|---:|---:|"])
+            for n in sorted({row["n_predict"] for row in selected}):
+                cells = []
+                for category in ("high_entropy", "mixed", "low_entropy"):
+                    row = lookup.get((n, category))
+                    cells.append(f'{row["weighted_accepted_tokens_per_second"]:.2f} ± {row["weighted_population_stddev"]:.2f} (N={row["samples"]})' if row else "—")
+                report.append(f"| {n} | " + " | ".join(cells) + " |")
+            report.append("")
+    output_path.with_suffix(".md").write_text("\n".join(report), encoding="utf-8")
+    return output_path
+
+
+def save_speed_category_plots(results_dir: Path, output_root: Path, metric: str) -> list[Path]:
+    """Pool 1k/2k speed workloads into one plot per entropy category."""
+    rows = [row for row in load_rows(results_dir, metric)
+            if row["bench"] in {"throughput_1k", "throughput_2k"}]
+    output_dir = output_dir_for(results_dir, output_root)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    saved_paths: list[Path] = []
+    for category, label in (("high_entropy", "High entropy"),
+                            ("mixed", "Mixed entropy"),
+                            ("low_entropy", "Low entropy")):
+        category_rows = [row for row in rows if row["category"] == category]
+        if not category_rows:
+            continue
+        output_path = output_dir / f"speed_{category}_{metric}_accepted_tokens_per_second.png"
+        plot_bench_category("Speed tests", label, category_rows, output_path,
+                            metric, "1k + 2k workloads; all output lengths")
+        saved_paths.append(output_path)
+    return saved_paths
+
+
 def default_result_dirs() -> list[Path]:
     results_dir = result_directory()
     candidate_names = ("MTP throughput", "mtp")
@@ -313,6 +397,16 @@ def parse_args() -> argparse.Namespace:
         help="Directory for generated plots. Defaults to benchmark_plots.",
     )
     parser.add_argument(
+        "--weighted-average",
+        action="store_true",
+        help="Save token-weighted throughput by speed category and n_predict instead of plotting.",
+    )
+    parser.add_argument(
+        "--speed-categories",
+        action="store_true",
+        help="Combine 1k/2k speed tests into three entropy plots, with one series per n_predict.",
+    )
+    parser.add_argument(
         "--metric",
         choices=("server", "e2e"),
         default="server",
@@ -327,7 +421,12 @@ def main() -> None:
     saved_paths: list[Path] = []
 
     for results_dir in result_dirs:
-        saved_paths.extend(save_plots(results_dir, args.output_dir, args.metric))
+        if args.weighted_average:
+            path = save_speed_weighted_averages(results_dir, args.output_dir, args.metric)
+            print(f"Saved weighted averages to {path.resolve()}")
+            continue
+        plot_function = save_speed_category_plots if args.speed_categories else save_plots
+        saved_paths.extend(plot_function(results_dir, args.output_dir, args.metric))
 
     for path in saved_paths:
         print(f"Saved plot to {path.resolve()}")

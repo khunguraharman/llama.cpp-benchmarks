@@ -1,0 +1,911 @@
+{
+  "metric": "server",
+  "formula": "sum(completion_tokens * accepted_tokens_per_second) / sum(completion_tokens)",
+  "stddev_formula": "sqrt(sum(completion_tokens * (accepted_tokens_per_second - weighted_mean)^2) / sum(completion_tokens))",
+  "workloads": [
+    "throughput_1k",
+    "throughput_2k"
+  ],
+  "results": [
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 48512,
+      "weighted_accepted_tokens_per_second": 70.41792685502101,
+      "weighted_population_stddev": 3.8815771867087014
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 95616,
+      "weighted_accepted_tokens_per_second": 73.11179779792293,
+      "weighted_population_stddev": 4.1992805436470455
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 188978,
+      "weighted_accepted_tokens_per_second": 78.16817712761788,
+      "weighted_population_stddev": 3.5952181500267186
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 48572,
+      "weighted_accepted_tokens_per_second": 98.8411775251483,
+      "weighted_population_stddev": 9.463738687824089
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 94103,
+      "weighted_accepted_tokens_per_second": 106.58477126688196,
+      "weighted_population_stddev": 9.859754205715182
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 182167,
+      "weighted_accepted_tokens_per_second": 119.57130005365644,
+      "weighted_population_stddev": 10.682046059537193
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 48572,
+      "weighted_accepted_tokens_per_second": 107.85239463166715,
+      "weighted_population_stddev": 13.765937678872197
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 94930,
+      "weighted_accepted_tokens_per_second": 119.91344732683974,
+      "weighted_population_stddev": 15.902820298995385
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 181438,
+      "weighted_accepted_tokens_per_second": 142.5865454002455,
+      "weighted_population_stddev": 16.891552574706566
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 48628,
+      "weighted_accepted_tokens_per_second": 107.03680013189397,
+      "weighted_population_stddev": 17.814369247496277
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 95231,
+      "weighted_accepted_tokens_per_second": 121.80893606586254,
+      "weighted_population_stddev": 21.27826243324245
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 185437,
+      "weighted_accepted_tokens_per_second": 147.050587082693,
+      "weighted_population_stddev": 24.076413659979863
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 48628,
+      "weighted_accepted_tokens_per_second": 104.15462084147913,
+      "weighted_population_stddev": 18.37786040730147
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 95573,
+      "weighted_accepted_tokens_per_second": 119.40587847694853,
+      "weighted_population_stddev": 25.288812468768775
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "high_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 186674,
+      "weighted_accepted_tokens_per_second": 151.7793657910235,
+      "weighted_population_stddev": 29.33158424141586
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 41462,
+      "weighted_accepted_tokens_per_second": 73.97442285130884,
+      "weighted_population_stddev": 4.966834468631042
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 73827,
+      "weighted_accepted_tokens_per_second": 75.59098980050463,
+      "weighted_population_stddev": 4.017000887738129
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 128266,
+      "weighted_accepted_tokens_per_second": 79.464961179055,
+      "weighted_population_stddev": 3.7562575399792872
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 41573,
+      "weighted_accepted_tokens_per_second": 108.40662040251111,
+      "weighted_population_stddev": 13.219097418210909
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 76784,
+      "weighted_accepted_tokens_per_second": 114.00230109768536,
+      "weighted_population_stddev": 10.392999755524997
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 141294,
+      "weighted_accepted_tokens_per_second": 124.0446036831945,
+      "weighted_population_stddev": 10.817574740322355
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 41324,
+      "weighted_accepted_tokens_per_second": 122.46537626110236,
+      "weighted_population_stddev": 21.552497607400234
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 75214,
+      "weighted_accepted_tokens_per_second": 130.9776275551842,
+      "weighted_population_stddev": 17.855492478206443
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 141281,
+      "weighted_accepted_tokens_per_second": 149.35443927033845,
+      "weighted_population_stddev": 17.863629734465604
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 41651,
+      "weighted_accepted_tokens_per_second": 124.63002077251464,
+      "weighted_population_stddev": 25.384172400168502
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 75520,
+      "weighted_accepted_tokens_per_second": 137.8677023377631,
+      "weighted_population_stddev": 21.306042006752637
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 136527,
+      "weighted_accepted_tokens_per_second": 160.2196407032578,
+      "weighted_population_stddev": 22.50319727785714
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 41620,
+      "weighted_accepted_tokens_per_second": 124.83233055772816,
+      "weighted_population_stddev": 30.12743193586895
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 76291,
+      "weighted_accepted_tokens_per_second": 136.38248532868278,
+      "weighted_population_stddev": 23.46091659852501
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "low_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 143875,
+      "weighted_accepted_tokens_per_second": 166.54165832518996,
+      "weighted_population_stddev": 25.32655274196637
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 1,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 17600,
+      "weighted_accepted_tokens_per_second": 65.45461247594943,
+      "weighted_population_stddev": 1.079933863654381
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 1,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 17600,
+      "weighted_accepted_tokens_per_second": 65.18595680704871,
+      "weighted_population_stddev": 1.0103262539439657
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 1,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 17600,
+      "weighted_accepted_tokens_per_second": 65.4411735864679,
+      "weighted_population_stddev": 0.9128690970908162
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 2,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 89.74995553799859,
+      "weighted_population_stddev": 0.8429189567173547
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 2,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 89.74705469323557,
+      "weighted_population_stddev": 0.7480937728947726
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 2,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 89.77741855407943,
+      "weighted_population_stddev": 0.42233259520996513
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 3,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 91.17538089005684,
+      "weighted_population_stddev": 1.411009452276686
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 3,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 91.05007426725864,
+      "weighted_population_stddev": 1.2646043867837438
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 3,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 91.24806838770702,
+      "weighted_population_stddev": 1.3578734413693136
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 4,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 90.2074143693496,
+      "weighted_population_stddev": 0.4601517389601707
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 4,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 90.14793519432419,
+      "weighted_population_stddev": 0.5557897870967069
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 4,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 90.21843657888603,
+      "weighted_population_stddev": 0.39125451453898913
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 5,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 86.09803551236503,
+      "weighted_population_stddev": 0.6937092728251029
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 5,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 85.78944357509482,
+      "weighted_population_stddev": 0.3074704408773596
+    },
+    {
+      "workload": "throughput_1k",
+      "category": "mixed",
+      "n_predict": 5,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 86.05153848469435,
+      "weighted_population_stddev": 0.5019164630784103
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 49208,
+      "weighted_accepted_tokens_per_second": 70.34387760068448,
+      "weighted_population_stddev": 4.258188914014822
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 96325,
+      "weighted_accepted_tokens_per_second": 72.88548657810031,
+      "weighted_population_stddev": 4.423276160014941
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 186799,
+      "weighted_accepted_tokens_per_second": 78.19526111106067,
+      "weighted_population_stddev": 3.7645063589842547
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 49191,
+      "weighted_accepted_tokens_per_second": 102.53696086649501,
+      "weighted_population_stddev": 8.663957903029287
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 94906,
+      "weighted_accepted_tokens_per_second": 109.03003883106084,
+      "weighted_population_stddev": 10.721554870140343
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 185454,
+      "weighted_accepted_tokens_per_second": 121.21003065462833,
+      "weighted_population_stddev": 10.217206116919819
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 49191,
+      "weighted_accepted_tokens_per_second": 110.73089905692855,
+      "weighted_population_stddev": 12.903915087125053
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 94832,
+      "weighted_accepted_tokens_per_second": 120.6523946971319,
+      "weighted_population_stddev": 13.634113158824261
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 186608,
+      "weighted_accepted_tokens_per_second": 142.2897944519459,
+      "weighted_population_stddev": 14.244840672963987
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 49209,
+      "weighted_accepted_tokens_per_second": 107.34045248517506,
+      "weighted_population_stddev": 14.535343103050398
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 97212,
+      "weighted_accepted_tokens_per_second": 119.8693288162265,
+      "weighted_population_stddev": 18.92379454796274
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 188114,
+      "weighted_accepted_tokens_per_second": 145.15627570290692,
+      "weighted_population_stddev": 21.311597772083157
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 49209,
+      "weighted_accepted_tokens_per_second": 104.51059005640079,
+      "weighted_population_stddev": 16.263100869919338
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 97296,
+      "weighted_accepted_tokens_per_second": 122.8406585042969,
+      "weighted_population_stddev": 21.992811632850646
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "high_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 190906,
+      "weighted_accepted_tokens_per_second": 156.4851527777924,
+      "weighted_population_stddev": 23.107615546486375
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 43808,
+      "weighted_accepted_tokens_per_second": 74.43981897043138,
+      "weighted_population_stddev": 4.142914959835306
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 83220,
+      "weighted_accepted_tokens_per_second": 76.612336362969,
+      "weighted_population_stddev": 3.1299043211037936
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 1,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 160929,
+      "weighted_accepted_tokens_per_second": 80.09051010619245,
+      "weighted_population_stddev": 2.9090723123598186
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 43973,
+      "weighted_accepted_tokens_per_second": 111.81678962081332,
+      "weighted_population_stddev": 12.104586047246901
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 82453,
+      "weighted_accepted_tokens_per_second": 117.58718718511231,
+      "weighted_population_stddev": 9.79280802009321
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 2,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 157816,
+      "weighted_accepted_tokens_per_second": 125.87876177235145,
+      "weighted_population_stddev": 8.95856347947206
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 43973,
+      "weighted_accepted_tokens_per_second": 125.4622048307405,
+      "weighted_population_stddev": 18.05025916308987
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 80957,
+      "weighted_accepted_tokens_per_second": 135.07606819801404,
+      "weighted_population_stddev": 16.344291280125315
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 3,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 150760,
+      "weighted_accepted_tokens_per_second": 148.0775106249204,
+      "weighted_population_stddev": 15.149985211309243
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 44127,
+      "weighted_accepted_tokens_per_second": 127.98941338260212,
+      "weighted_population_stddev": 22.522344607922875
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 82979,
+      "weighted_accepted_tokens_per_second": 138.1062780529974,
+      "weighted_population_stddev": 16.57045545865201
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 4,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 155491,
+      "weighted_accepted_tokens_per_second": 158.57219243447108,
+      "weighted_population_stddev": 19.797079727576822
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 44127,
+      "weighted_accepted_tokens_per_second": 129.5187744235367,
+      "weighted_population_stddev": 26.271608295666155
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 84025,
+      "weighted_accepted_tokens_per_second": 141.7237112049211,
+      "weighted_population_stddev": 22.261381797793973
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "low_entropy",
+      "n_predict": 5,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 158235,
+      "weighted_accepted_tokens_per_second": 167.01223809168212,
+      "weighted_population_stddev": 25.07916652213598
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 1,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 17600,
+      "weighted_accepted_tokens_per_second": 66.57534923723405,
+      "weighted_population_stddev": 1.0605222798639777
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 1,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 17600,
+      "weighted_accepted_tokens_per_second": 66.50278602804394,
+      "weighted_population_stddev": 1.101322974068887
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 1,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 17600,
+      "weighted_accepted_tokens_per_second": 66.37116941981455,
+      "weighted_population_stddev": 0.9224780673464478
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 2,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 89.77604809027328,
+      "weighted_population_stddev": 0.8571422051949157
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 2,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 89.61273223119294,
+      "weighted_population_stddev": 0.5438857315802652
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 2,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 89.25261776875585,
+      "weighted_population_stddev": 1.2151069054265589
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 3,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 91.31581685176342,
+      "weighted_population_stddev": 1.3844239247603034
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 3,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 90.7353857496999,
+      "weighted_population_stddev": 1.1125513436365047
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 3,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 18350,
+      "weighted_accepted_tokens_per_second": 91.21361621418512,
+      "weighted_population_stddev": 1.2930642705833377
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 4,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 89.72272127876674,
+      "weighted_population_stddev": 0.8878077911409686
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 4,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 89.4301850805642,
+      "weighted_population_stddev": 0.7840313961667192
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 4,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 89.55896339891244,
+      "weighted_population_stddev": 0.35108777846853245
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 5,
+      "maximum_output_tokens": 1024,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 86.0986033917724,
+      "weighted_population_stddev": 0.8220101413886828
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 5,
+      "maximum_output_tokens": 2048,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 85.99246004787527,
+      "weighted_population_stddev": 0.3510863612237829
+    },
+    {
+      "workload": "throughput_2k",
+      "category": "mixed",
+      "n_predict": 5,
+      "maximum_output_tokens": 4096,
+      "samples": 50,
+      "total_generated_tokens": 19050,
+      "weighted_accepted_tokens_per_second": 86.02769030140496,
+      "weighted_population_stddev": 0.41341687378229186
+    }
+  ]
+}

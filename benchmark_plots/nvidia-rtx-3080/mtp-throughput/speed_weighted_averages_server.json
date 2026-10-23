@@ -1,0 +1,115 @@
+{
+  "metric": "server",
+  "formula": "sum(completion_tokens * accepted_tokens_per_second) / sum(completion_tokens)",
+  "workloads": [
+    "throughput_1k",
+    "throughput_2k"
+  ],
+  "results": [
+    {
+      "category": "high_entropy",
+      "n_predict": 1,
+      "samples": 300,
+      "total_generated_tokens": 665438,
+      "weighted_accepted_tokens_per_second": 75.54093770862946
+    },
+    {
+      "category": "high_entropy",
+      "n_predict": 2,
+      "samples": 300,
+      "total_generated_tokens": 654393,
+      "weighted_accepted_tokens_per_second": 113.82027459716285
+    },
+    {
+      "category": "high_entropy",
+      "n_predict": 3,
+      "samples": 300,
+      "total_generated_tokens": 655571,
+      "weighted_accepted_tokens_per_second": 131.08220650948942
+    },
+    {
+      "category": "high_entropy",
+      "n_predict": 4,
+      "samples": 300,
+      "total_generated_tokens": 663831,
+      "weighted_accepted_tokens_per_second": 133.0374345141427
+    },
+    {
+      "category": "high_entropy",
+      "n_predict": 5,
+      "samples": 300,
+      "total_generated_tokens": 668286,
+      "weighted_accepted_tokens_per_second": 137.3346010057776
+    },
+    {
+      "category": "low_entropy",
+      "n_predict": 1,
+      "samples": 300,
+      "total_generated_tokens": 531512,
+      "weighted_accepted_tokens_per_second": 77.82714248656264
+    },
+    {
+      "category": "low_entropy",
+      "n_predict": 2,
+      "samples": 300,
+      "total_generated_tokens": 543893,
+      "weighted_accepted_tokens_per_second": 119.99624568274837
+    },
+    {
+      "category": "low_entropy",
+      "n_predict": 3,
+      "samples": 300,
+      "total_generated_tokens": 533509,
+      "weighted_accepted_tokens_per_second": 140.18418304104313
+    },
+    {
+      "category": "low_entropy",
+      "n_predict": 4,
+      "samples": 300,
+      "total_generated_tokens": 536295,
+      "weighted_accepted_tokens_per_second": 147.756923385002
+    },
+    {
+      "category": "low_entropy",
+      "n_predict": 5,
+      "samples": 300,
+      "total_generated_tokens": 548173,
+      "weighted_accepted_tokens_per_second": 152.5289464548201
+    },
+    {
+      "category": "mixed",
+      "n_predict": 1,
+      "samples": 300,
+      "total_generated_tokens": 105600,
+      "weighted_accepted_tokens_per_second": 65.9218412590931
+    },
+    {
+      "category": "mixed",
+      "n_predict": 2,
+      "samples": 300,
+      "total_generated_tokens": 110100,
+      "weighted_accepted_tokens_per_second": 89.65263781258928
+    },
+    {
+      "category": "mixed",
+      "n_predict": 3,
+      "samples": 300,
+      "total_generated_tokens": 110100,
+      "weighted_accepted_tokens_per_second": 91.12305706011182
+    },
+    {
+      "category": "mixed",
+      "n_predict": 4,
+      "samples": 300,
+      "total_generated_tokens": 114300,
+      "weighted_accepted_tokens_per_second": 89.88094265013387
+    },
+    {
+      "category": "mixed",
+      "n_predict": 5,
+      "samples": 300,
+      "total_generated_tokens": 114300,
+      "weighted_accepted_tokens_per_second": 86.00962855220114
+    }
+  ]
+}
