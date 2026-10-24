@@ -1,6 +1,6 @@
 # RTX 3080: token-weighted generation throughput
 
-Source: `C:\Users\Harman\Documents\Python\llama.cpp benchmarks\results\nvidia-rtx-3080\mtp-speed-bench-results`
+Source: `C:\Users\khung\Documents\Python\llama.cpp-benchmarks\results\nvidia-rtx-3080\mtp-speed-bench-results`
 
 Each cell is weighted mean ± one weighted population standard deviation, in tokens/s.
 Weights are `completion_tokens`; speed is `predicted_per_second` (server generation speed).

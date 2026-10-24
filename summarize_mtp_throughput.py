@@ -1,6 +1,7 @@
 """Export token-weighted MTP generation throughput and population SD tables."""
 
 import argparse
+import csv
 import json
 import math
 import re
@@ -12,7 +13,7 @@ ROOT = Path(__file__).resolve().parent
 DEFAULT_INPUT = ROOT / "results/nvidia-rtx-3080/mtp-speed-bench-results"
 PATTERN = re.compile(
     r"mtp_n(?P<n>\d+)_(?P<bench>throughput_[12]k)_"
-    r"(?P<entropy>high_entropy|low_entropy)_osl(?P<osl>\d+)\.json"
+    r"(?P<entropy>high_entropy|low_entropy)_osl(?P<osl>\d+)(?:_run\d+)?\.json"
 )
 
 
@@ -107,7 +108,13 @@ def main():
     rows = summarize(args.input_dir)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(render(rows, args.input_dir), encoding="utf-8")
+    csv_path = args.output.with_suffix(".csv")
+    with csv_path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
     print(f"Exported {len(rows)} configurations to {args.output.resolve()}")
+    print(f"Saved CSV to {csv_path.resolve()}")
 
 
 if __name__ == "__main__":
