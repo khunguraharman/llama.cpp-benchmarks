@@ -91,12 +91,22 @@ def main():
                 bbox=dict(facecolor="white", alpha=.85, edgecolor="none", pad=3))
         ax.axhline(total, color=MUTED, linewidth=1, linestyle="--")
         ax.text(seconds[-1]*.99, total+110, "10 GiB capacity", ha="right", color=MUTED, fontsize=9)
-        ax.set(xlabel="Time since first GPU sample (seconds)", ylabel="VRAM used (MiB)",
+        ax.set(xlabel="Time Since First GPU Sample [s]", ylabel="VRAM Used [MiB]",
                xlim=(0, seconds[-1]), ylim=(0, total*1.08))
         percent = ax.secondary_yaxis("right", functions=(lambda v: v/total*100, lambda p: p*total/100))
-        percent.set_ylabel("VRAM capacity used (%)", color=MUTED)
-        percent.tick_params(colors=MUTED)
-        set_dashboard_title(ax, f"{spec['label']} · Q8_0 · VRAM vs time · RTX 3080")
+        percent.set_ylabel("VRAM Capacity Used [%]", color=MUTED,
+                           fontfamily="DejaVu Sans", fontsize=10)
+        percent.tick_params(colors=MUTED, labelsize=9, length=3, width=.7, pad=6)
+        set_dashboard_title(ax, f"{spec['label']} · Q8_0 · VRAM vs. Time · RTX 3080")
+        # The reference memory/3080 SVGs use DejaVu Sans for titles and axes.
+        # Set it explicitly so installed dashboard fonts cannot change the match.
+        ax.set_title(ax.get_title(loc="left"), loc="left", fontfamily="DejaVu Sans")
+        for label in (ax.xaxis.label, ax.yaxis.label):
+            label.set_fontfamily("DejaVu Sans")
+            label.set_fontsize(10)
+        for label in (*ax.get_xticklabels(), *ax.get_yticklabels(), *percent.get_yticklabels()):
+            label.set_fontfamily("DejaVu Sans")
+            label.set_fontsize(9)
         style_dashboard_legend(ax, loc="upper left", fontsize=9)
         fig.text(.09, .035,
             f"Accounted VRAM: {accounted:,.0f} MiB = idle system + Q8_0 weights + {context:,}-token FP16 KV cache.\n"
