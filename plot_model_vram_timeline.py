@@ -23,7 +23,7 @@ from plot_localai_style import (
 ROOT = Path(__file__).resolve().parent
 SOURCE = ROOT / "results/nvidia-rtx-3080/model-speed-bench-results"
 OUTPUT = ROOT / "benchmark_plots/nvidia-rtx-3080/model-vram-timelines"
-CONTEXT_TOKENS = 8172
+CONTEXT_TOKENS = 8192
 IDLE_MIB = 1.4 * 10**9 / 2**20  # 1.4 decimal GB; fixed user-supplied baseline.
 # Sizes retrieved from Hugging Face model APIs on 2026-10-26.
 MODELS = {
@@ -71,7 +71,7 @@ def main():
         colors = ["#7b8c98", "#82684d", "#c17b50"]
         labels = [f"Idle system: 1.4 GB ({IDLE_MIB:,.0f} MiB)",
                   f"Q8_0 weights: +{weights:,.0f} MiB",
-                  f"8,172-token KV: +{kv:,.0f} MiB"]
+                  f"{context:,}-token KV: +{kv:,.0f} MiB"]
         for low, high, color, label, fraction in zip(
                 levels, levels[1:], colors, labels, (.08, .30, .55)):
             ax.axhspan(low, high, color=color, alpha=.09, linewidth=0)
