@@ -108,12 +108,7 @@ def main():
             label.set_fontfamily("DejaVu Sans")
             label.set_fontsize(9)
         style_dashboard_legend(ax, loc="upper left", fontsize=9)
-        fig.text(.09, .035,
-            f"Accounted VRAM: {accounted:,.0f} MiB = idle system + Q8_0 weights + {context:,}-token FP16 KV cache.\n"
-            "Fixed idle offset: 1.4 GB (decimal). Weight estimate uses published GGUF size; full GPU offload, one sequence.\n"
-            "Runtime buffers estimated from the remaining gap; also includes other runtime overhead and estimation error.",
-            fontsize=9, color=MUTED, linespacing=1.6)
-        fig.tight_layout(rect=(0, .16, 1, 1))
+        fig.tight_layout()
         for ext in ("png", "svg"):
             fig.savefig(OUTPUT / f"{model}-vram-vs-time.{ext}", dpi=180, facecolor=BACKGROUND)
         plt.close(fig)
