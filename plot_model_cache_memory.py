@@ -7,7 +7,6 @@ from datetime import datetime
 from pathlib import Path
 
 import matplotlib
-import numpy as np
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -114,6 +113,13 @@ def rows(path):
     return result
 
 
+def nearest_sample_index(times, target):
+    """Return the closest recorded timestamp; prefer the earlier one on ties."""
+    right = bisect_left(times, target)
+    candidates = range(max(0, right - 1), min(len(times), right + 1))
+    return min(candidates, key=lambda index: (abs(times[index] - target), index))
+
+
 def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     for font_path in (OUTPUT / "fonts").glob("*.ttf"):
@@ -155,8 +161,8 @@ def main():
         sample_time_shifts.append(dict(model=label, time_shift_seconds=shift))
         sample_references.append((label, observed.get_color(), sample_times, sample_memory))
         # Map each cumulative input-token count to measured RAM at the same
-        # aligned sample endpoint. Interpolate raw RAM samples, without
-        # extrapolating past the monitoring interval.
+        # aligned sample endpoint using the nearest actual RAM reading.
+        # Keep the original measured value; do not interpolate or smooth it.
         endpoint = rx[0] + shift
         cumulative_tokens = 0
         token_x, token_y = [0], [rv[0]]
@@ -165,11 +171,14 @@ def main():
             endpoint += result["latency_s"]
             cumulative_tokens += result["prompt_tokens"]
             if rx[0] <= endpoint <= rx[-1]:
-                measured = float(np.interp(endpoint, rx, rv))
+                ram_index = nearest_sample_index(rx, endpoint)
+                measured = rv[ram_index]
                 token_x.append(cumulative_tokens)
                 token_y.append(measured)
                 token_records.append(dict(model=label, sample=sample,
                     aligned_time_seconds=endpoint,
+                    ram_sample_time_seconds=rx[ram_index],
+                    ram_sample_time_error_seconds=rx[ram_index] - endpoint,
                     cumulative_input_tokens=cumulative_tokens,
                     measured_private_working_set_mib=measured,
                     calculated_private_working_set_mib=rv[0] + cumulative_tokens * mib_per_token))
@@ -256,15 +265,21 @@ def main():
     for label, color, tokens, memory, total, baseline, slope in token_series:
         ax.plot([0, total], [baseline, baseline + total * slope],
                 color=color, linestyle="--", linewidth=1.6, alpha=.85,
-                label=f"{label}: Calculated FP16 KV ({slope:.6f} MiB/token)")
+                label=f"{label}: Calculated FP16 KV (m = {slope:.6f} MiB/token)")
     ax.set(xlabel="Cumulative Input Tokens [tokens]",
            ylabel="Private Working Set [MiB]",
            xlim=(0, max(s[4] for s in token_series) * 1.02),
            ylim=(0, ram_ceiling))
     ax.xaxis.set_major_formatter(matplotlib.ticker.StrMethodFormatter("{x:,.0f}"))
-    set_dashboard_title(ax, "RTX 3080: Process RAM vs. Cumulative Input Tokens")
+    set_dashboard_title(ax, "Windows Desktop: Process RAM vs. Cumulative Input Tokens")
+    ax.text(.055, .055,
+            r"$\mathrm{PWS}(N) = \mathrm{PWS}_0 + mN$"
+            "\n"
+            r"$m = \frac{2\,L\,H_{\mathrm{KV}}\,d_{\mathrm{head}}\,b}{2^{20}}\quad[\mathrm{MiB/token}]$",
+            transform=ax.transAxes, ha="left", va="bottom", fontsize=10,
+            color=MUTED, linespacing=1.7)
     style_reference_typography(ax)
-    style_dashboard_legend(ax, loc="lower right")
+    style_dashboard_legend(ax, loc="lower right", fontsize=12)
     fig.tight_layout()
     for extension in ("png", "svg"):
         fig.savefig(OUTPUT / f"ram-vs-input-tokens.{extension}", dpi=180,
