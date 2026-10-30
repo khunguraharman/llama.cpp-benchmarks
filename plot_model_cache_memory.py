@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from matplotlib import font_manager
 
 from plot_localai_style import (
-    BACKGROUND, HEADING, MUTED, apply_dashboard_style,
+    BACKGROUND, MUTED, SERIES_COLORS, apply_dashboard_style,
     set_dashboard_title, style_dashboard_legend,
 )
 
@@ -58,15 +58,6 @@ def smooth_memory(times, values, window_seconds=9):
         right = bisect_right(times, time + window_seconds / 2)
         result.append((prefix[right] - prefix[left]) / (right - left))
     return result
-
-
-def add_kv_references(ax, references, ceiling):
-    """Show an uncapped accumulation reference, not a fitted RAM prediction."""
-    for label, color, start, baseline, rate, prompt, dims in references:
-        end = start + (ceiling - baseline) / rate
-        ax.plot([start, end], [baseline, ceiling], color=color, linestyle="--",
-                linewidth=1.6, alpha=.85,
-                label=f"{label} FP16 KV reference: {rate:.1f} [MiB/s]")
 
 
 def sample_kv_reference(results, start, baseline, dims):
@@ -124,17 +115,13 @@ def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     for font_path in (OUTPUT / "fonts").glob("*.ttf"):
         font_manager.fontManager.addfont(str(font_path))
-    fig, axes = plt.subplots(2, 1, figsize=(12, 11), sharex=True)
-    for ax in axes:
-        apply_dashboard_style(fig, ax)
     summaries = []
     series_data = []
-    references = []
     sample_references = []
     sample_time_shifts = []
     token_series = []
     token_records = []
-    for (model, label), marker in zip(MODELS, ("o", "s", "^")):
+    for (model, label), marker, color in zip(MODELS, ("o", "s", "^"), SERIES_COLORS):
         stem = SOURCE / f"{model}_throughput_1k_low_entropy_osl1"
         # Model names include a dot: append suffixes instead of replacing them.
         gpu = rows(Path(str(stem) + ".gpu.csv"))
@@ -146,20 +133,14 @@ def main():
         rv = [int(r["private_working_set_bytes"]) / 2**20 for r in ram]
         gv = [float(r["memory_used_mib"]) for r in gpu]
         series_data.append((label, marker, rx, rv, gx, gv))
-        observed, = axes[0].plot(rx, smooth_memory(rx, rv), linewidth=2,
-                     label=f"{label}: {rv[0]:,.0f} → {rv[-1]:,.0f} [MiB]")
         successful = [r for r in data["results"] if r.get("ok")]
-        prompt = sum(r["prompt_tokens"] for r in successful) / len(successful)
-        request_rate = len(successful) / sum(r["latency_s"] for r in successful)
         dims = KV_DIMENSIONS[label]
         layers, heads, dim = dims
-        rate = request_rate * prompt * 2 * layers * heads * dim * 2 / 2**20
-        references.append((label, observed.get_color(), rx[0], rv[0], rate, prompt, dims))
         sample_times, sample_memory = sample_kv_reference(successful, rx[0], rv[0], dims)
         sample_times, sample_memory, shift = align_sample_reference(
             sample_times, sample_memory, rx, rv)
         sample_time_shifts.append(dict(model=label, time_shift_seconds=shift))
-        sample_references.append((label, observed.get_color(), sample_times, sample_memory))
+        sample_references.append((label, color, sample_times, sample_memory))
         # Map each cumulative input-token count to measured RAM at the same
         # aligned sample endpoint using the nearest actual RAM reading.
         # Keep the original measured value; do not interpolate or smooth it.
@@ -182,10 +163,8 @@ def main():
                     cumulative_input_tokens=cumulative_tokens,
                     measured_private_working_set_mib=measured,
                     calculated_private_working_set_mib=rv[0] + cumulative_tokens * mib_per_token))
-        token_series.append((label, observed.get_color(), token_x, token_y,
+        token_series.append((label, color, token_x, token_y,
                              cumulative_tokens, rv[0], mib_per_token))
-        axes[1].plot(gx, smooth_memory(gx, gv), linewidth=2,
-                     label=f"{label}: {gv[0]:,.0f} → {gv[-1]:,.0f} [MiB]")
         summaries.append(dict(model=label, completed_requests=data["completed_samples"],
                               ram_start_mib=rv[0], ram_end_mib=rv[-1],
                               ram_growth_mib=rv[-1]-rv[0],
@@ -194,51 +173,6 @@ def main():
                               vram_min_mib=min(gv), vram_max_mib=max(gv)))
     duration = max(max(s[2][-1], s[4][-1]) for s in series_data) * 1.02
     ram_ceiling = max(max(s[3]) for s in series_data) * 1.15
-    add_kv_references(axes[0], references, ram_ceiling)
-    counts = ", ".join(f"{s['model']}: {s['completed_requests']}" for s in summaries)
-    axes[0].set(ylabel="Private Working Set [MiB]", ylim=(0, ram_ceiling))
-    axes[1].set(ylabel="Device Memory Used [MiB]", ylim=(0, 11000),
-                xlabel="Time Since First GPU Sample [s]")
-    set_dashboard_title(axes[0], "Process RAM vs. Time")
-    set_dashboard_title(axes[1], "GPU Memory vs. Time")
-    axes[1].axhline(10240, color=MUTED, linewidth=1, linestyle="--")
-    axes[1].text(duration * .99, 10370, "10 GiB capacity", ha="right", color=MUTED)
-    for ax in axes:
-        ax.set_xlim(0, duration)
-        style_reference_typography(ax)
-        style_dashboard_legend(ax, loc="lower right" if ax is axes[0] else "lower left")
-    title = fig.suptitle("RTX 3080: Memory During Sequential Prompt Processing", fontsize=12,
-                 fontfamily="DejaVu Sans", fontweight="medium", color=HEADING,
-                 x=0, ha="left", y=0.98)
-    fig.tight_layout(rect=(0, 0, 1, 0.95), h_pad=2.2)
-    # Match the reference titles' alignment with the left edge of the axes.
-    title.set_x(axes[0].get_position().x0)
-    fig.savefig(OUTPUT / "memory-timelines.png", dpi=170, facecolor=BACKGROUND)
-    plt.close(fig)
-    for kind in ("ram", "vram"):
-        fig, ax = plt.subplots(figsize=(12, 8) if kind == "ram" else (10, 5.2))
-        apply_dashboard_style(fig, ax)
-        for label, marker, rx, rv, gx, gv in series_data:
-            x, y = (rx, rv) if kind == "ram" else (gx, gv)
-            ax.plot(x, smooth_memory(x, y), linewidth=2, label=label)
-        ax.set(xlabel="Time Since First GPU Sample [s]", xlim=(0, duration),
-               ylabel="Private Working Set [MiB]" if kind == "ram" else "Device Memory Used [MiB]",
-               ylim=(0, ram_ceiling if kind == "ram" else 11000))
-        set_dashboard_title(ax, "RTX 3080: " + ("Process RAM" if kind == "ram" else "GPU Memory") + " vs. Time")
-        style_reference_typography(ax)
-        if kind == "vram":
-            ax.axhline(10240, color=MUTED, linewidth=1, linestyle="--")
-            ax.text(duration * .99, 10370, "10 GiB capacity", ha="right", color=MUTED)
-        else:
-            add_kv_references(ax, references, ram_ceiling)
-        style_dashboard_legend(ax, loc="lower right" if kind == "ram" else "lower left", ncol=1 if kind == "ram" else 3)
-        fig.tight_layout()
-        fig.savefig(OUTPUT / f"{kind}-vs-time-localai.png", dpi=180, facecolor=BACKGROUND)
-        fig.savefig(OUTPUT / f"{kind}-vs-time-localai.svg", facecolor=BACKGROUND)
-        if kind == "ram":
-            for name in ("ram-vs-time-bracketed-units.png", "ram-vs-time-reference-updated.png"):
-                fig.savefig(OUTPUT / name, dpi=180, facecolor=BACKGROUND)
-        plt.close(fig)
     fig, ax = plt.subplots(figsize=(12, 8))
     apply_dashboard_style(fig, ax)
     for label, marker, rx, rv, gx, gv in series_data:
@@ -246,12 +180,24 @@ def main():
                 label=f"{label}: Measured RAM")
     for label, color, times, memory in sample_references:
         ax.plot(times, memory, color=color, linestyle="--", linewidth=1.6,
-                alpha=.85, label=f"{label}: Calculated FP16 KV (per sample, aligned)")
+                alpha=.85, label=f"{label}: Calculated FP16 KV (aligned)")
     ax.set(xlabel="Time Since First GPU Sample [s]", xlim=(0, duration),
-           ylabel="Private Working Set [MiB]", ylim=(0, ram_ceiling))
-    set_dashboard_title(ax, "RTX 3080: Process RAM vs. Time · Per-Sample KV Reference")
+           ylabel="Process Memory [MiB]", ylim=(0, ram_ceiling))
+    set_dashboard_title(ax, "Windows Desktop: Process RAM vs. Time")
+    ax.text(.23, .12,
+            r"$M_{\mathrm{process}}(t_i) = M_{\mathrm{process},0} + m\sum_{j=1}^{i} N_j(t_i)$"
+            "\n"
+            r"$t_i = \Delta t_0 + \sum_{j=1}^{i} \ell_j$"
+            "\n"
+            r"$m = \frac{2\,L\,H_{\mathrm{KV}}\,d_{\mathrm{head}}\,s_{\mathrm{KV}}}{2^{20}}\quad[\mathrm{MiB/token}]$",
+            transform=ax.transAxes, ha="left", va="bottom", fontsize=13,
+            color=MUTED, linespacing=2.5)
+    ax.text(.23, .035,
+            r"$N_j$: prompt tokens; $\ell_j$: response latency; $\Delta t_0$: fixed initial time offset",
+            transform=ax.transAxes, ha="left", va="bottom", fontsize=9,
+            color=MUTED)
     style_reference_typography(ax)
-    style_dashboard_legend(ax, loc="lower right")
+    style_dashboard_legend(ax, loc="lower right", fontsize=12)
     fig.tight_layout()
     for extension in ("png", "svg"):
         fig.savefig(OUTPUT / f"ram-vs-time-per-sample.{extension}", dpi=180,
@@ -266,17 +212,17 @@ def main():
         ax.plot([0, total], [baseline, baseline + total * slope],
                 color=color, linestyle="--", linewidth=1.6, alpha=.85,
                 label=f"{label}: Calculated FP16 KV (m = {slope:.6f} MiB/token)")
-    ax.set(xlabel="Cumulative Input Tokens [tokens]",
-           ylabel="Private Working Set [MiB]",
+    ax.set(xlabel="Cumulative Input Tokens",
+           ylabel="Process Memory [MiB]",
            xlim=(0, max(s[4] for s in token_series) * 1.02),
            ylim=(0, ram_ceiling))
     ax.xaxis.set_major_formatter(matplotlib.ticker.StrMethodFormatter("{x:,.0f}"))
     set_dashboard_title(ax, "Windows Desktop: Process RAM vs. Cumulative Input Tokens")
-    ax.text(.055, .055,
-            r"$\mathrm{PWS}(N) = \mathrm{PWS}_0 + mN$"
+    ax.text(.08, .085,
+            r"$M_{\mathrm{process}}(N) = M_{\mathrm{process},0} + mN$"
             "\n"
-            r"$m = \frac{2\,L\,H_{\mathrm{KV}}\,d_{\mathrm{head}}\,b}{2^{20}}\quad[\mathrm{MiB/token}]$",
-            transform=ax.transAxes, ha="left", va="bottom", fontsize=10,
+            r"$m = \frac{2\,L\,H_{\mathrm{KV}}\,d_{\mathrm{head}}\,s_{\mathrm{KV}}}{2^{20}}\quad[\mathrm{MiB/token}]$",
+            transform=ax.transAxes, ha="left", va="bottom", fontsize=13,
             color=MUTED, linespacing=1.7)
     style_reference_typography(ax)
     style_dashboard_legend(ax, loc="lower right", fontsize=12)
@@ -298,7 +244,7 @@ def main():
         writer.writeheader()
         writer.writerows(summaries)
     print(json.dumps(summaries, indent=2))
-    print(OUTPUT / "memory-timelines.png")
+    print(OUTPUT)
 
 
 if __name__ == "__main__":
