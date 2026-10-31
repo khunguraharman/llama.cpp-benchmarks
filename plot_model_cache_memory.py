@@ -169,24 +169,26 @@ def main():
                 label=f"{label}: Measured RAM")
     for label, color, times, memory in sample_references:
         ax.plot(times, memory, color=color, linestyle="--", linewidth=1.6,
-                alpha=.85, label=f"{label}: Calculated FP16 KV (aligned)")
+                alpha=.85, label=f"{label}: Calculated FP16 KV")
     ax.set(xlabel="Time Since First GPU Sample [s]", xlim=(0, duration),
            ylabel="Process Memory [MiB]", ylim=(0, ram_ceiling))
     set_dashboard_title(ax, "Windows Desktop: Process RAM vs. Time")
     ax.text(.23, .12,
-            r"$M_{\mathrm{process}}(t_i) = M_{\mathrm{process},0} + m\sum_{j=1}^{i} N_j(t_i)$"
+            r"$M_{\mathrm{process}}(t_i) = M_{\mathrm{process},0} + m\sum_{j=1}^{i} N_j(t_j)$"
             "\n"
             r"$t_i = \Delta t_0 + \sum_{j=1}^{i} \ell_j$"
             "\n"
             r"$m = \frac{2\,L\,H_{\mathrm{KV}}\,d_{\mathrm{head}}\,s_{\mathrm{KV}}}{2^{20}}\quad[\mathrm{MiB/token}]$",
-            transform=ax.transAxes, ha="left", va="bottom", fontsize=13,
-            color=MUTED, linespacing=2.5)
+            transform=ax.transAxes, ha="left", va="bottom", fontsize=14,
+            color="#283531", linespacing=2.5)
     ax.text(.23, .035,
-            r"$N_j$: prompt tokens; $\ell_j$: response latency; $\Delta t_0$: fixed initial time offset",
-            transform=ax.transAxes, ha="left", va="bottom", fontsize=9,
-            color=MUTED)
+            r"$N_j$: prompt tokens; $\ell_j$: response latency"
+            "\n"
+            r"$\Delta t_0$: fixed initial time offset",
+            transform=ax.transAxes, ha="left", va="bottom", fontsize=10,
+            color="#283531")
     style_reference_typography(ax)
-    style_dashboard_legend(ax, loc="lower right", fontsize=12)
+    style_dashboard_legend(ax, loc="lower right", fontsize=13)
     fig.tight_layout()
     for extension in ("png", "svg"):
         fig.savefig(OUTPUT / f"ram-vs-time-per-sample.{extension}", dpi=180,
@@ -208,7 +210,7 @@ def main():
     ax.xaxis.set_major_formatter(matplotlib.ticker.StrMethodFormatter("{x:,.0f}"))
     set_dashboard_title(ax, "Windows Desktop: Process RAM vs. Cumulative Input Tokens")
     ax.text(.08, .085,
-            r"$M_{\mathrm{process}}(N) = M_{\mathrm{process},0} + mN$"
+            r"$M_{\mathrm{process}}(C_i) = M_{\mathrm{process},0} + mC_i$"
             "\n"
             r"$m = \frac{2\,L\,H_{\mathrm{KV}}\,d_{\mathrm{head}}\,s_{\mathrm{KV}}}{2^{20}}\quad[\mathrm{MiB/token}]$",
             transform=ax.transAxes, ha="left", va="bottom", fontsize=13,
