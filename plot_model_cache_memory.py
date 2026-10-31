@@ -10,6 +10,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib import font_manager
 
 from plot_localai_style import (
@@ -45,19 +46,6 @@ def style_reference_typography(ax):
     for label in (*ax.get_xticklabels(), *ax.get_yticklabels()):
         label.set_fontfamily("DejaVu Sans")
         label.set_fontsize(9)
-
-
-def smooth_memory(times, values, window_seconds=9):
-    """Centered time-window mean for display; raw values drive summaries."""
-    prefix = [0.0]
-    for value in values:
-        prefix.append(prefix[-1] + value)
-    result = []
-    for time in times:
-        left = bisect_left(times, time - window_seconds / 2)
-        right = bisect_right(times, time + window_seconds / 2)
-        result.append((prefix[right] - prefix[left]) / (right - left))
-    return result
 
 
 def sample_kv_reference(results, start, baseline, dims):
@@ -141,9 +129,8 @@ def main():
             sample_times, sample_memory, rx, rv)
         sample_time_shifts.append(dict(model=label, time_shift_seconds=shift))
         sample_references.append((label, color, sample_times, sample_memory))
-        # Map each cumulative input-token count to measured RAM at the same
-        # aligned sample endpoint using the nearest actual RAM reading.
-        # Keep the original measured value; do not interpolate or smooth it.
+        # Reparameterize the time plot at each aligned prompt endpoint:
+        # interpolate raw RAM readings, then replace time with tokens.
         endpoint = rx[0] + shift
         cumulative_tokens = 0
         token_x, token_y = [0], [rv[0]]
@@ -154,14 +141,16 @@ def main():
             if rx[0] <= endpoint <= rx[-1]:
                 ram_index = nearest_sample_index(rx, endpoint)
                 measured = rv[ram_index]
+                plotted_memory = float(np.interp(endpoint, rx, rv))
                 token_x.append(cumulative_tokens)
-                token_y.append(measured)
+                token_y.append(plotted_memory)
                 token_records.append(dict(model=label, sample=sample,
                     aligned_time_seconds=endpoint,
                     ram_sample_time_seconds=rx[ram_index],
                     ram_sample_time_error_seconds=rx[ram_index] - endpoint,
                     cumulative_input_tokens=cumulative_tokens,
                     measured_private_working_set_mib=measured,
+                    interpolated_process_memory_mib=plotted_memory,
                     calculated_private_working_set_mib=rv[0] + cumulative_tokens * mib_per_token))
         token_series.append((label, color, token_x, token_y,
                              cumulative_tokens, rv[0], mib_per_token))
@@ -176,7 +165,7 @@ def main():
     fig, ax = plt.subplots(figsize=(12, 8))
     apply_dashboard_style(fig, ax)
     for label, marker, rx, rv, gx, gv in series_data:
-        ax.plot(rx, smooth_memory(rx, rv), linewidth=2,
+        ax.plot(rx, rv, linewidth=2,
                 label=f"{label}: Measured RAM")
     for label, color, times, memory in sample_references:
         ax.plot(times, memory, color=color, linestyle="--", linewidth=1.6,
