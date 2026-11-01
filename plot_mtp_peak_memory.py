@@ -93,6 +93,7 @@ def render(rows, output_dir):
         fig.subplots_adjust(left=.085, right=.98, top=.82, bottom=.08, hspace=.5, wspace=.22)
         path = output_dir / filename
         svg_path = path.with_suffix(".svg")
+        fig.savefig(path, dpi=200, facecolor="white")
         fig.savefig(svg_path, facecolor="white")
         plt.close(fig)
         print(svg_path.resolve())

@@ -49,6 +49,7 @@ def render_comparison(rows, output_dir):
                  color=HEADING, fontfamily=_font("Space Grotesk"), fontweight="medium")
     fig.subplots_adjust(left=.055, right=.985, top=.9, bottom=.09, hspace=.42, wspace=.27)
     # Export each panel with its own title, axes, and legend.
+    fig._suptitle.set_visible(False)
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     for i, bench in enumerate(benches):
@@ -56,6 +57,7 @@ def render_comparison(rows, output_dir):
             bounds = axes[i, j].get_tightbbox(renderer).transformed(fig.dpi_scale_trans.inverted())
             svg_path = output_dir / f"weighted_throughput_{bench}_osl{osl}.svg"
             fig.savefig(svg_path, bbox_inches=bounds.padded(.15), format="svg")
+            fig.savefig(svg_path.with_suffix(".png"), bbox_inches=bounds.padded(.15), dpi=200)
             print(svg_path.resolve())
     plt.close(fig)
 

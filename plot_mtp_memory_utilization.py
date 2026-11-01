@@ -25,9 +25,10 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 
 from platform_paths import device_name, result_directory, results_root
-from plot_style import (
+from plot_localai_style import (
     apply_dashboard_style,
     save_dashboard_figure,
     set_dashboard_title,
@@ -36,6 +37,10 @@ from plot_style import (
 
 
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*", "<", ">", "h", "8"]
+FONT_DIR = Path(__file__).resolve().parent / "benchmark_plots" / "fonts"
+for font_name in ("DMSans-static.ttf", "SpaceGrotesk-static.ttf"):
+    font_manager.fontManager.addfont(str(FONT_DIR / font_name))
+
 TIMESTAMP_FORMATS = (
     "%Y/%m/%d %H:%M:%S.%f",
     "%Y-%m-%d %H:%M:%S.%f",
@@ -390,6 +395,7 @@ def plot_timeline(rows: list[RunRow], output_path: Path, title: str) -> bool:
     style_dashboard_legend(ax, title="MTP")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     save_dashboard_figure(fig, ax, output_path)
+    fig.savefig(output_path.with_suffix(".svg"), facecolor=fig.get_facecolor(), edgecolor="none")
     plt.close(fig)
     return True
 
@@ -432,6 +438,7 @@ def plot_peak_summary(
     style_dashboard_legend(ax, title="MTP")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     save_dashboard_figure(fig, ax, output_path)
+    fig.savefig(output_path.with_suffix(".svg"), facecolor=fig.get_facecolor(), edgecolor="none")
     plt.close(fig)
     return True
 
