@@ -6,6 +6,7 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 
 from summarize_mtp_throughput import DEFAULT_INPUT, ROOT, summarize
 from plot_localai_style import (
@@ -16,8 +17,13 @@ from plot_localai_style import (
 
 def render_comparison(rows, output_dir):
     output_dir.mkdir(parents=True, exist_ok=True)
+    for name in ("DMSans-static.ttf", "SpaceGrotesk-static.ttf"):
+        font_manager.fontManager.addfont(str(ROOT / "benchmark_plots/fonts" / name))
     benches = sorted({r["bench"] for r in rows})
     lengths = sorted({r["osl"] for r in rows})
+    lower = min(r["mean"] - r["sd"] for r in rows)
+    upper = max(r["mean"] + r["sd"] for r in rows)
+    padding = max((upper - lower) * .08, 1)
     plt.rcParams.update({
         "font.family": _font("DM Sans"), "font.size": 10,
         "text.color": TEXT, "axes.titlecolor": HEADING,
@@ -43,8 +49,8 @@ def render_comparison(rows, output_dir):
             ax.set_xticks(sorted({r["n_predict"] for r in subset}))
             ax.set_xlabel("n_predict")
             ax.set_ylabel("Tokens per sec")
-            ax.set_ylim(90, max(r["mean"] + r["sd"] for r in rows) + 8)
-            style_dashboard_legend(ax, loc="upper left")
+            ax.set_ylim(max(0, lower - padding), upper + padding)
+            style_dashboard_legend(ax, loc="best")
     fig.suptitle("RTX 3080 · Weighted generation throughput", fontsize=19, y=.98,
                  color=HEADING, fontfamily=_font("Space Grotesk"), fontweight="medium")
     fig.subplots_adjust(left=.055, right=.985, top=.9, bottom=.09, hspace=.42, wspace=.27)
