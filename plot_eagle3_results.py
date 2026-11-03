@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import json
 from pathlib import Path
 
 from plot_mtp_peak_memory import load_peaks, render as render_memory
@@ -20,7 +21,13 @@ def main():
         "--output-dir", type=Path,
         default=ROOT / "benchmark_plots/nvidia-rtx-3080/eagle3-speed-bench-results",
     )
+    parser.add_argument("--memory-only", action="store_true",
+                        help="Update only the annotated VRAM chart and memory summaries")
     args = parser.parse_args()
+    memory_spec = json.loads((ROOT / "eagle3_memory_spec.json").read_text(encoding="utf-8"))
+    if args.memory_only:
+        render_memory(load_peaks(args.input_dir), args.output_dir, memory_spec=memory_spec)
+        return
     rows = summarize(args.input_dir)
     peaks = load_peaks(args.input_dir)
     keys = lambda records: {
@@ -37,7 +44,7 @@ def main():
         writer.writerows(rows)
     render_comparison(rows, args.output_dir)
     render_changes(rows, args.output_dir)
-    render_memory(peaks, args.output_dir)
+    render_memory(peaks, args.output_dir, memory_spec=memory_spec)
     print(f"Plotted {len(rows)} configurations, {sum(r['runs'] for r in rows)} samples, "
           f"and {len(peaks)} GPU logs.")
 

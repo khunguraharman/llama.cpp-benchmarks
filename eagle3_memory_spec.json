@@ -1,0 +1,19 @@
+{
+  "model": "Qwen3-4B-eagle3.gguf",
+  "metadata_read_date": "2026-11-03",
+  "model_path": "C:/Users/Harman/Documents/C++/llama.cpp/LLMs/Qwen3-4B-eagle3.gguf",
+  "launch_script": "C:/Users/Harman/Documents/C++/llama.cpp/bench-eagle3-speed.bat",
+  "source_checkout_commit": "147c3bf0734823f44ee76c3d595c4666d8719b75",
+  "weight_tensor_bytes": 436766720,
+  "weight_description": "Sum of all 14 GGUF tensor payloads, including the 256000-byte d2t mapping; mostly BF16 with F32 norms. Approximation of GPU weight allocation under full offload; excludes file metadata and allocator padding, and may include small CPU-resident tensors. Shared target embeddings are not counted again.",
+  "draft_layers": 1,
+  "kv_heads": 8,
+  "key_head_dim": 128,
+  "value_head_dim": 128,
+  "key_bytes": 2,
+  "value_bytes": 2,
+  "cache_type": "FP16",
+  "context_tokens": 8192,
+  "sequences": 1,
+  "assumptions": "Current local GGUF and launch-script defaults represent this benchmark: full GPU offload, one sequence, FP16 draft K/V, 8192 context tokens. Historical logs confirm target context but do not expose every allocation or environment override. KV is allocated capacity, not just occupied tokens."
+}
