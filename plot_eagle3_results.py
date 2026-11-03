@@ -19,7 +19,7 @@ def main():
     )
     parser.add_argument(
         "--output-dir", type=Path,
-        default=ROOT / "benchmark_plots/nvidia-rtx-3080/eagle3-speed-bench-results",
+        default=ROOT / "benchmark_plots/nvidia-rtx-3080/mtp/eagle3-speed-bench-results",
     )
     parser.add_argument("--memory-only", action="store_true",
                         help="Update only the annotated VRAM chart and memory summaries")
