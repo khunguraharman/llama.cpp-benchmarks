@@ -1,4 +1,4 @@
-"""Compare peak GPU memory across MTP n_predict, with one series per OSL.
+"""Compare peak GPU memory across speculative n_predict, with one series per OSL.
 
 Each point is the maximum logged sample across the entire benchmark file.
 Allocated VRAM is reported in MiB; prompt length and entropy are never pooled.
@@ -21,7 +21,7 @@ from plot_localai_style import (
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_INPUT = ROOT / "results/nvidia-rtx-3080/mtp-speed-bench-results"
-NAME = re.compile(r"mtp_n(\d+)_(throughput_\d+k)_(high_entropy|low_entropy)_osl(\d+)\.gpu\.csv")
+NAME = re.compile(r"(?:mtp|eagle3)_n(\d+)_(throughput_\d+k)_(high_entropy|low_entropy)_osl(\d+)\.gpu\.csv")
 MARKERS = ("o", "s", "^", "D", "v", "P")
 
 

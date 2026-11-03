@@ -1,4 +1,4 @@
-"""Export token-weighted MTP generation throughput and population SD tables."""
+"""Export token-weighted speculative generation throughput and population SD tables."""
 
 import argparse
 import csv
@@ -12,14 +12,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DEFAULT_INPUT = ROOT / "results/nvidia-rtx-3080/mtp-speed-bench-results"
 PATTERN = re.compile(
-    r"mtp_n(?P<n>\d+)_(?P<bench>throughput_[12]k)_"
+    r"(?:mtp|eagle3)_n(?P<n>\d+)_(?P<bench>throughput_[12]k)_"
     r"(?P<entropy>high_entropy|low_entropy)_osl(?P<osl>\d+)(?:_run\d+)?\.json"
 )
 
 
 def summarize(input_dir):
     groups = defaultdict(list)
-    for path in sorted(input_dir.glob("mtp_n*.json")):
+    for path in sorted(input_dir.glob("*.json")):
         match = PATTERN.fullmatch(path.name)
         if match is None:
             continue
