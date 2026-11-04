@@ -14,7 +14,7 @@ import numpy as np
 from matplotlib import font_manager
 
 from plot_localai_style import (
-    BACKGROUND, MUTED, SERIES_COLORS, apply_dashboard_style,
+    BACKGROUND, SERIES_COLORS, apply_dashboard_style,
     set_dashboard_title, style_dashboard_legend,
 )
 
@@ -202,7 +202,7 @@ def main():
     for label, color, tokens, memory, total, baseline, slope in token_series:
         ax.plot([0, total], [baseline, baseline + total * slope],
                 color=color, linestyle="--", linewidth=1.6, alpha=.85,
-                label=f"{label}: Calculated FP16 KV (m = {slope:.6f} MiB/token)")
+                label=f"{label}: Calculated FP16 KV")
     ax.set(xlabel="Cumulative Input Tokens",
            ylabel="Process Memory [MiB]",
            xlim=(0, max(s[4] for s in token_series) * 1.02),
@@ -214,9 +214,9 @@ def main():
             "\n"
             r"$m = \frac{2\,L\,H_{\mathrm{KV}}\,d_{\mathrm{head}}\,s_{\mathrm{KV}}}{2^{20}}\quad[\mathrm{MiB/token}]$",
             transform=ax.transAxes, ha="left", va="bottom", fontsize=13,
-            color=MUTED, linespacing=1.7)
+            color="#283531", linespacing=1.7)
     style_reference_typography(ax)
-    style_dashboard_legend(ax, loc="lower right", fontsize=12)
+    style_dashboard_legend(ax, loc="lower right", fontsize=13)
     fig.tight_layout()
     for extension in ("png", "svg"):
         fig.savefig(OUTPUT / f"ram-vs-input-tokens.{extension}", dpi=180,
