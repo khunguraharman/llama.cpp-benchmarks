@@ -15,12 +15,18 @@ from plot_localai_style import (
 )
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+def main(*, input_dirs=None, output_subdir="mtp", description=__doc__):
+    parser = argparse.ArgumentParser(description=description)
     parser.add_argument("--bench", choices=("throughput_1k", "throughput_2k"), default="throughput_1k")
     parser.add_argument("--osl", type=int, default=1024)
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "benchmark_plots/hardware-comparison/mtp/titled")
+    parser.add_argument("--output-dir", type=Path,
+                        default=ROOT / "benchmark_plots/hardware-comparison" / output_subdir)
     args = parser.parse_args()
+    if input_dirs is None:
+        input_dirs = (
+            "results/nvidia-rtx-3080/mtp-speed-bench-results",
+            "results/m4-mac-mini/mtp/mtp-speed-bench-results",
+        )
     for name in ("DMSans-static.ttf", "SpaceGrotesk-static.ttf"):
         font_manager.fontManager.addfont(str(ROOT / "benchmark_plots/fonts" / name))
     plt.rcParams.update({
@@ -30,10 +36,7 @@ def main():
         "lines.markersize": 5,
     })
     fig, axes = plt.subplots(1, 2, figsize=(11, 5.4), sharex=True)
-    for ax, label, directory in zip(axes, ("RTX 3080", "M4 Mac mini"), (
-        "results/nvidia-rtx-3080/mtp-speed-bench-results",
-        "results/m4-mac-mini/mtp-speed-bench-results",
-    )):
+    for ax, label, directory in zip(axes, ("RTX 3080", "M4 Mac mini"), input_dirs):
         rows = [r for r in summarize(ROOT / directory)
                 if r["bench"] == args.bench and r["osl"] == args.osl]
         if not rows:
