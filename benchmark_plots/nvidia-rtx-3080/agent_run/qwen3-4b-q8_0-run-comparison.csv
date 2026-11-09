@@ -1,0 +1,3 @@
+run,requests,tool_calls,input_tokens,output_tokens,elapsed_seconds
+Cache enabled,21,,136813,12718,123.73994499999999
+No cache,17,,100306,25873,266.815797

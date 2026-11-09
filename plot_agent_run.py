@@ -79,18 +79,18 @@ def parse_log(path):
             pending[key] = Request(seconds(stamp), int(event.rsplit("task.n_tokens = ", 1)[1]))
         elif key in pending:
             request = pending[key]
-            if event.startswith("cached n_tokens = "):
-                request.reused = int(event.split(",")[0].split(" = ")[1])
-            elif timing := TIMING.match(event):
+            if timing := TIMING.match(event):
                 tokens, rate = int(timing[2]), float(timing[3])
                 if timing[1] == "prompt eval":
                     request.prefill = (tokens, rate)
                 else:
                     request.generation = (tokens, rate)
             elif event.startswith("stop processing: n_tokens = "):
-                if request.prefill is None or request.generation is None or request.reused is None:
+                if request.prefill is None or request.generation is None:
                     raise ValueError(f"Missing metrics for task {task} in slot {slot}")
-                if request.prompt_tokens - request.prefill[0] != request.reused:
+                # Batch-progress cache messages include newly evaluated tokens.
+                request.reused = request.prompt_tokens - request.prefill[0]
+                if not 0 <= request.reused <= request.prompt_tokens:
                     raise ValueError(f"Prompt token accounting mismatch for task {task} in slot {slot}")
                 request.end = seconds(stamp)
                 request.retained = int(event.split(",")[0].split(" = ")[1])
@@ -101,7 +101,7 @@ def parse_log(path):
     return requests, saved_cache
 
 
-def plot_run(requests, saved_cache, output):
+def plot_run(requests, saved_cache, output, run_label=""):
     origin = min(request.start for request in requests)
     elapsed = max(request.end for request in requests) - origin
     starts = [request.start - origin for request in requests]
@@ -158,6 +158,8 @@ def plot_run(requests, saved_cache, output):
                 cache_counts.append(count)
         cached.step(cache_times + [elapsed], cache_counts + [cache_counts[-1]], where="post",
                     color=terracotta, label="Saved prompts in RAM")
+    else:
+        cached.plot([0, elapsed], [0, 0], color=terracotta, label="Saved prompts in RAM (disabled)")
     cached.scatter(ends, [request.retained for request in requests],
                    color=green, s=22, label="Active slot at request end")
 
@@ -186,7 +188,7 @@ def plot_run(requests, saved_cache, output):
     style_dashboard_legend(throughput, loc="lower left", ncol=3)
     style_dashboard_legend(cached, loc="upper left")
 
-    fig.text(.075, .965, "Qwen3-4B-Q8_0 agent run", fontsize=23, fontweight="medium",
+    fig.text(.075, .965, f"Qwen3-4B-Q8_0 agent run{run_label}", fontsize=23, fontweight="medium",
              fontfamily="Space Grotesk", color=HEADING)
     fig.text(.075, .933, f"RTX 3080  /  {len(requests)} requests  /  {running_total:,} generated tokens",
              fontsize=11, color=MUTED)
@@ -204,11 +206,19 @@ def plot_run(requests, saved_cache, output):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("log", nargs="?", type=Path, default=LOG)
-    parser.add_argument("--output", type=Path, default=OUTPUT / "qwen3-4b-q8_0-timelines.png")
+    parser.add_argument("log", nargs="?", type=Path,
+                        help="Log to plot; defaults to both cached and no-cache runs")
+    parser.add_argument("--output", type=Path, help="Output image for a single supplied log")
     args = parser.parse_args()
-    requests, saved_cache = parse_log(args.log)
-    plot_run(requests, saved_cache, args.output)
+    if args.output and args.log is None:
+        parser.error("--output requires a log path")
+    logs = [args.log] if args.log else [LOG, LOG.with_name(f"{LOG.stem}-no-cache.log")]
+    for log in logs:
+        no_cache = log.stem.endswith("-no-cache")
+        suffix = "-no-cache" if no_cache else ""
+        output = args.output or OUTPUT / f"qwen3-4b-q8_0{suffix}-timelines.png"
+        requests, saved_cache = parse_log(log)
+        plot_run(requests, saved_cache, output, " · no cache" if no_cache else " · cache enabled")
 
 
 if __name__ == "__main__":
