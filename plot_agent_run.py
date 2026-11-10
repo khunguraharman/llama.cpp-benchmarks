@@ -35,8 +35,8 @@ SLOT_LINE = re.compile(
 CACHE_STATE = re.compile(rf"^({STAMP}).*? - cache state: (\d+) prompts")
 CACHE_ENTRY = re.compile(r" - prompt [^:]+:\s+(\d+) tokens, checkpoints:")
 TIMING = re.compile(
-    r"(prompt eval|eval) time\s*=\s*[\d.]+ ms\s*/\s*(\d+) tokens "
-    r"\([^,]+,\s*([\d.]+) tokens per second\)"
+    r"(prompt eval|eval) time\s*=\s*(?P<duration_ms>[\d.]+) ms\s*/\s*(?P<tokens>\d+) tokens "
+    r"\([^,]+,\s*(?P<rate>[\d.]+) tokens per second\)"
 )
 
 
@@ -49,6 +49,7 @@ class Request:
     generation: tuple[int, float] | None = None
     end: float = 0
     retained: int = 0
+    prefill_seconds: float = 0
 
 
 def seconds(stamp):
@@ -80,9 +81,10 @@ def parse_log(path):
         elif key in pending:
             request = pending[key]
             if timing := TIMING.match(event):
-                tokens, rate = int(timing[2]), float(timing[3])
+                tokens, rate = int(timing["tokens"]), float(timing["rate"])
                 if timing[1] == "prompt eval":
                     request.prefill = (tokens, rate)
+                    request.prefill_seconds = float(timing["duration_ms"]) / 1_000
                 else:
                     request.generation = (tokens, rate)
             elif event.startswith("stop processing: n_tokens = "):

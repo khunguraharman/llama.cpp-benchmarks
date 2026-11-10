@@ -13,6 +13,21 @@ from plot_localai_style import (
 )
 
 
+def split_conversations(requests):
+    """Split these two-conversation runs at the first prompt-context reset.
+
+    Later short prompts belong to conversation 2 (including its no-cache
+    retry after context exhaustion), so they must not create new series.
+    Server logs do not contain explicit conversation IDs.
+    """
+    ordered = sorted(requests, key=lambda request: request.start)
+    boundary = next((i for i in range(1, len(ordered))
+                     if ordered[i].prompt_tokens < ordered[i - 1].prompt_tokens), None)
+    if boundary is None:
+        raise ValueError("Cannot identify conversation 2: no prompt-context reset")
+    return ordered[:boundary], ordered[boundary:]
+
+
 def main():
     records = []
     for label, path in (
@@ -20,69 +35,52 @@ def main():
         ("No cache", LOG.with_name(f"{LOG.stem}-no-cache.log")),
     ):
         requests, _ = parse_log(path)
-        records.append(dict(
-            run=label,
-            requests=len(requests),
-            tool_calls=None,
-            input_tokens=sum(r.prompt_tokens for r in requests),
-            output_tokens=sum(r.generation[0] for r in requests),
-            elapsed_seconds=max(r.end for r in requests) - min(r.start for r in requests),
-        ))
+        for conversation, group in enumerate(split_conversations(requests), start=1):
+            records.append(dict(
+                run=label,
+                conversation=conversation,
+                requests=len(group),
+                tool_calls=None,
+                prompt_tokens_processed=sum(r.prefill[0] for r in group),
+                prompt_processing_seconds=sum(r.prefill_seconds for r in group),
+                output_tokens=sum(r.generation[0] for r in group),
+                elapsed_seconds=max(r.end for r in group) - min(r.start for r in group),
+            ))
 
     for font in (ROOT / "benchmark_plots/fonts").glob("*-static.ttf"):
         font_manager.fontManager.addfont(str(font))
-    fig, axes = plt.subplots(2, 3, figsize=(14, 8))
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
     metrics = (
-        ("requests", "Requests to server", "Completed inference requests"),
-        ("tool_calls", "Tool calls", ""),
+        ("prompt_processing_seconds", "Prompt processing time", "Seconds"),
         ("elapsed_seconds", "Time to completion", "Seconds"),
-        ("input_tokens", "Total input tokens", "Tokens, including reused input"),
+        ("prompt_tokens_processed", "Total prompt tokens processed", "Tokens, excluding reused input"),
         ("output_tokens", "Total output tokens", "Generated tokens"),
     )
     for ax, (field, title, unit) in zip(axes.flat, metrics):
         apply_dashboard_style(fig, ax)
         set_dashboard_title(ax, title)
-        if field == "tool_calls":
-            ax.set_axis_off()
-            ax.text(.5, .56, "Unavailable for both runs", ha="center", va="center",
-                    transform=ax.transAxes, fontsize=14, color=HEADING)
-            ax.text(.5, .35, "Server logs do not record tool calls", ha="center",
-                    transform=ax.transAxes, fontsize=10, color=MUTED)
-            continue
-        values = [record[field] for record in records]
-        bars = ax.bar([0, 1], values, width=.5, color=SERIES_COLORS[:2])
-        ax.set_xticks([0, 1], [record["run"] for record in records])
+        all_values = [record[field] for record in records]
+        for conversation, color in enumerate(SERIES_COLORS[:2], start=1):
+            series = [record for record in records if record["conversation"] == conversation]
+            values = [record[field] for record in series]
+            positions = [x + (conversation - 1.5) * .36 for x in (0, 1)]
+            bars = ax.bar(positions, values, width=.34, color=color)
+            labels = [f"{v:,.2f} s" if field.endswith("_seconds") else f"{v:,}" for v in values]
+            ax.bar_label(bars, labels=labels, padding=6, fontsize=10, color=HEADING)
+        ax.set_xticks([0, 1], ["Cache enabled", "No cache"])
         ax.set_ylabel(unit)
-        ax.set_ylim(0, max(values) * 1.3)
-        ax.yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))
-        labels = [f"{v:,.2f} s" if field == "elapsed_seconds" else f"{v:,}" for v in values]
-        ax.bar_label(bars, labels=labels, padding=6, fontsize=12, color=HEADING)
-        change = 100 * (values[0] / values[1] - 1)
-        ax.text(.5, .96, f"Cache enabled vs no cache: {change:+.1f}%",
-                ha="center", va="top", transform=ax.transAxes, fontsize=9, color=MUTED)
+        ax.set_ylim(0, max(all_values) * 1.25)
+        ax.yaxis.set_major_formatter(StrMethodFormatter(
+            "{x:,.1f}" if field == "prompt_processing_seconds" else "{x:,.0f}"
+        ))
 
-    note = axes.flat[-1]
-    note.set_axis_off()
-    note.text(0, .92, "How to read these totals", fontsize=13, color=HEADING,
-              transform=note.transAxes)
-    note.text(0, .77,
-              "Requests count completed model calls.\n"
-              "Input sums full prompts across requests;\n"
-              "repeated context is counted each time.\n\n"
-              "Time spans first prompt to last response,\n"
-              "including gaps between requests.\n"
-              "Agent work after that is not recorded.\n\n"
-              "The runs produced different request and\n"
-              "output totals; this is an observed-run\n"
-              "comparison, not an isolated cache speedup.",
-              fontsize=9, color=MUTED, linespacing=1.2, va="top", transform=note.transAxes)
     fig.text(.065, .95, "Qwen3-4B-Q8_0 · agent run comparison", fontsize=23,
              fontfamily="Space Grotesk", fontweight="medium", color=HEADING)
-    fig.text(.065, .905, "RTX 3080  /  totals from the two server logs", fontsize=11, color=MUTED)
-    fig.legend(handles=[Patch(color=color, label=record["run"])
-                        for color, record in zip(SERIES_COLORS, records)],
+    fig.text(.065, .905, "RTX 3080  /  per-conversation totals from the two server logs", fontsize=11, color=MUTED)
+    fig.legend(handles=[Patch(color=color, label=f"Conversation {conversation}")
+                        for conversation, color in enumerate(SERIES_COLORS[:2], start=1)],
                loc="lower center", ncol=2, frameon=False, bbox_to_anchor=(.5, .01))
-    fig.subplots_adjust(left=.065, right=.97, top=.80, bottom=.12, wspace=.35, hspace=.55)
+    fig.subplots_adjust(left=.085, right=.97, top=.80, bottom=.12, wspace=.30, hspace=.55)
     OUTPUT.mkdir(parents=True, exist_ok=True)
     for extension in ("png", "svg"):
         fig.savefig(OUTPUT / f"qwen3-4b-q8_0-run-comparison.{extension}",
