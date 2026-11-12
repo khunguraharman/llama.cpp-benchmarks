@@ -1,5 +1,5 @@
-run,conversation,requests,tool_calls,prompt_tokens_processed,prompt_processing_seconds,output_tokens,elapsed_seconds
-Cache enabled,1,5,,2928,1.2499099999999999,4763,47.43096799999999
-Cache enabled,2,21,,1474,0.59018,6495,63.096896
-No cache,1,2,,2455,0.34758,1519,14.470828
-No cache,2,21,,1474,0.59035,6495,62.837959
+run,conversation,requests,tool_calls,prompt_tokens_processed,prompt_processing_seconds,output_tokens,elapsed_seconds,active_request_seconds
+RAM cache enabled,1,7,,4971,1.43817,8762,337.16549799999996,80.10280700000006
+RAM cache enabled,2,27,,5595,1.33165,26684,292.00173099999995,257.7246000000001
+RAM cache disabled,1,7,,6902,1.74379,7674,325.48711000000003,70.64774099999994
+RAM cache disabled,2,27,,8835,1.78732,26307,276.712124,254.76656499999993
