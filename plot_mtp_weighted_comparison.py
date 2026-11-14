@@ -15,7 +15,7 @@ from plot_localai_style import (
 )
 
 
-def render_comparison(rows, output_dir):
+def render_comparison(rows, output_dir, *, series_alpha=1.0):
     output_dir.mkdir(parents=True, exist_ok=True)
     for name in ("DMSans-static.ttf", "SpaceGrotesk-static.ttf"):
         font_manager.fontManager.addfont(str(ROOT / "benchmark_plots/fonts" / name))
@@ -45,7 +45,7 @@ def render_comparison(rows, output_dir):
                 series = sorted((r for r in subset if r["entropy"] == entropy), key=lambda r: r["n_predict"])
                 ax.errorbar([r["n_predict"] for r in series], [r["mean"] for r in series],
                             yerr=[r["sd"] for r in series], color=color, marker=marker,
-                            linestyle=linestyle, capsize=3, label=label)
+                            linestyle=linestyle, capsize=3, alpha=series_alpha, label=label)
             ax.set_xticks(sorted({r["n_predict"] for r in subset}))
             ax.set_xlabel("n_predict")
             ax.set_ylabel("Tokens per sec")
@@ -73,7 +73,7 @@ def main():
     parser.add_argument("--input-dir", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "benchmark_plots/nvidia-rtx-3080/mtp/mtp-speed-bench-results")
     args = parser.parse_args()
-    render_comparison(summarize(args.input_dir), args.output_dir)
+    render_comparison(summarize(args.input_dir), args.output_dir, series_alpha=0.6)
 
 
 if __name__ == "__main__":

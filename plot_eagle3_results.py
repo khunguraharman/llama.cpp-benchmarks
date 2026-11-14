@@ -1,12 +1,12 @@
-"""Generate Eagle3 throughput, speed-change, and peak-VRAM plots in the MTP style."""
+"""Generate Eagle3 throughput plots and export speed-change and peak-VRAM summaries."""
 
 import argparse
 import csv
 import json
 from pathlib import Path
 
-from plot_mtp_peak_memory import load_peaks, render as render_memory
-from plot_mtp_speed_changes import render as render_changes
+from plot_mtp_peak_memory import load_peaks, write_memory_summaries
+from plot_mtp_speed_changes import write_speed_changes
 from plot_mtp_weighted_comparison import render_comparison
 from summarize_mtp_throughput import ROOT, summarize
 
@@ -22,11 +22,11 @@ def main():
         default=ROOT / "benchmark_plots/nvidia-rtx-3080/mtp/eagle3-speed-bench-results",
     )
     parser.add_argument("--memory-only", action="store_true",
-                        help="Update only the annotated VRAM chart and memory summaries")
+                        help="Update only the memory summaries")
     args = parser.parse_args()
     memory_spec = json.loads((ROOT / "eagle3_memory_spec.json").read_text(encoding="utf-8"))
     if args.memory_only:
-        render_memory(load_peaks(args.input_dir), args.output_dir, memory_spec=memory_spec)
+        write_memory_summaries(load_peaks(args.input_dir), args.output_dir, memory_spec=memory_spec)
         return
     rows = summarize(args.input_dir)
     peaks = load_peaks(args.input_dir)
@@ -43,8 +43,8 @@ def main():
         writer.writeheader()
         writer.writerows(rows)
     render_comparison(rows, args.output_dir)
-    render_changes(rows, args.output_dir)
-    render_memory(peaks, args.output_dir, memory_spec=memory_spec)
+    write_speed_changes(rows, args.output_dir)
+    write_memory_summaries(peaks, args.output_dir, memory_spec=memory_spec)
     print(f"Plotted {len(rows)} configurations, {sum(r['runs'] for r in rows)} samples, "
           f"and {len(peaks)} GPU logs.")
 

@@ -11,4 +11,5 @@ if __name__ == "__main__":
         ),
         output_subdir="spec-decoding",
         description=__doc__,
+        method="Eagle3",
     )

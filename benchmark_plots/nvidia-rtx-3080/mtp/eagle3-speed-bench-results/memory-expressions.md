@@ -57,13 +57,8 @@ n=1 peak-device-memory difference is approximately 2898-2922 MiB. The remaining
 or other device-wide memory usage may contribute. These peak differences do not
 provide a direct measurement of individual runtime allocations.
 
-The updated PNG/SVG has four panels, each with vertical brackets and horizontal
-reference levels. Annotations use mean n=0 and n=1 peaks across OSL within each
-panel; original measured curves retain separate OSL values. The companion CSV
-reports each OSL independently. Weights and KV bands are estimated contributions
-placed above the baseline, not directly measured absolute allocation addresses.
-
-Regenerate only the memory plot with `python plot_eagle3_results.py --memory-only`.
+The companion CSV reports each OSL independently. Regenerate the memory summaries
+with `python plot_eagle3_results.py --memory-only`.
 The captured input dimensions, payload bytes and assumptions are in the root
 `eagle3_memory_spec.json`; output provenance is in `eagle3_memory_methodology.json`.
 Historical logs do not record all environment overrides; estimates assume the

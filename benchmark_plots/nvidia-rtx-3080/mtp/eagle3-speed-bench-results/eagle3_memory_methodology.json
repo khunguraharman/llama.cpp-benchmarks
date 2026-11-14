@@ -21,7 +21,6 @@
   "kv_formula": "sequences * context_tokens * draft_layers * kv_heads * (key_head_dim * key_bytes + value_head_dim * value_bytes)",
   "estimated_draft_weights_mib": 416.533203125,
   "estimated_draft_kv_mib": 32.0,
-  "annotation_reference": "n=0 and n=1 mean peak VRAM across OSL within each panel",
   "residual": "Difference of device-wide peaks minus estimates; not a measured buffer allocation. Includes changed compute/feature buffers, allocator effects and other device usage; exact attribution unavailable.",
   "breakdown": [
     {
