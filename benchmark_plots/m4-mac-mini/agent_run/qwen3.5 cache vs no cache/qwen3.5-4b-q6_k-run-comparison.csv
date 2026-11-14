@@ -1,0 +1,5 @@
+run,conversation,requests,tool_calls,prompt_tokens_processed,prompt_processing_seconds,output_tokens,elapsed_seconds,active_request_seconds
+RAM cache enabled,1,10,,10411,31.43631,1661,283.74841899999996,103.26312599999987
+RAM cache enabled,2,28,,15268,50.85942,13706,747.79359,696.6510629999998
+RAM cache disabled,1,10,,10411,31.34376,1661,285.539891,102.2285439999999
+RAM cache disabled,2,28,,15268,50.48025,13716,741.37699,690.339115

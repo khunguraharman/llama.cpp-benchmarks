@@ -12,7 +12,9 @@ import matplotlib.pyplot as plt
 
 ROOT = Path(__file__).resolve().parent
 LOG = ROOT / "results/nvidia-rtx-3080/agent_run/llama-server-Qwen3-4B-Q8_0.log"
-OUTPUT = ROOT / "benchmark_plots/nvidia-rtx-3080/agent_run"
+AGENT_RUN_PLOTS = ROOT / "benchmark_plots/nvidia-rtx-3080/agent_run"
+OUTPUT = AGENT_RUN_PLOTS / "qwen3 cache vs no cache"
+MODEL_COMPARISON_OUTPUT = AGENT_RUN_PLOTS / "qwen3 vs qwen3.5 cache"
 THROUGHPUT_WINDOW = 10
 STAMP = r"\d+\.\d{2}\.\d{3}\.\d{3}"
 SLOT_LINE = re.compile(
