@@ -20,7 +20,7 @@ from summarize_mtp_throughput import DEFAULT_INPUT, ROOT, summarize
 BENCH = "throughput_1k"
 ENTROPIES = ("low_entropy", "high_entropy")
 METHODS = ("MTP", "Eagle3")
-OUTPUT = ROOT / "benchmark_plots/nvidia-rtx-3080/mtp-vs-eagle3"
+OUTPUT = ROOT / "benchmark_plots/nvidia-rtx-3080/mtp/mtp-vs-eagle3"
 
 
 def compare(directory, osl):

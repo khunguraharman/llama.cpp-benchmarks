@@ -236,6 +236,33 @@ def plot_cache(runs, styles, hardware, output):
     save_figure(fig, output, "cache-use")
 
 
+def plot_generation_timeline(log, output, hardware):
+    requests, _, _ = parse_log(log)
+    origin = min(request.start for request in requests)
+    times = [request.end - origin for request in requests]
+    counts = [request.generation[0] for request in requests]
+    completion_gaps = [right - left for left, right in zip(times, times[1:]) if right > left]
+    width = min(max(times) / 160, .8 * min(completion_gaps, default=float("inf"))) or .5
+
+    fig, ax = plt.subplots(figsize=(14, 5))
+    apply_dashboard_style(fig, ax)
+    fig.text(.08, .90, "Qwen3-4B-Q8_0 · Tokens generated per request", fontsize=23,
+             fontfamily="Space Grotesk", fontweight="medium", color=HEADING)
+    fig.text(.08, .84, f"{hardware}  /  {len(requests)} requests  /  Plotted at request completion",
+             fontsize=11, color=MUTED)
+    fig.subplots_adjust(left=.08, right=.97, bottom=.17, top=.76)
+    ax.bar(times, counts, width=width, color=SERIES_COLORS[0], zorder=3)
+    ax.set_xlabel("Elapsed since first prompt (s)")
+    ax.set_ylabel("Generated tokens per request")
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=9))
+    ax.xaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))
+    ax.set_xlim(left=0)
+    ax.set_ylim(bottom=0)
+    ax.yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))
+    output.mkdir(parents=True, exist_ok=True)
+    save_figure(fig, output, "tokens-generated-vs-time")
+
+
 def plot_comparison(log, output, hardware, switches, cached_only):
     logs = {"RAM cache enabled": log}
     if not cached_only:
@@ -275,6 +302,8 @@ def main():
     parser.add_argument("--cached-switches", type=int, nargs=5, help="Cached log conversation switch task IDs")
     parser.add_argument("--no-cache-switches", type=int, nargs=5, help="No-cache log conversation switch task IDs")
     parser.add_argument("--cached-only", action="store_true", help="Plot only the cached series")
+    parser.add_argument("--generation-timeline", action="store_true",
+                        help="Plot generated tokens per request over time for the selected run")
     args = parser.parse_args()
     if args.path and args.log:
         parser.error("Supply the log path once")
@@ -282,6 +311,12 @@ def main():
     for font in (ROOT / "benchmark_plots/fonts").glob("*-static.ttf"):
         font_manager.fontManager.addfont(str(font))
     selected = args.log or args.path
+    if args.generation_timeline:
+        log = selected.resolve() if selected else LOG
+        hardware = args.hardware or BENCHMARKS.get(log, ("", {}))[0]
+        output = args.output or OUTPUT
+        plot_generation_timeline(log, output, hardware)
+        return
     if selected is None and (args.output or args.hardware or args.cached_switches or args.no_cache_switches):
         selected = LOG
     for log in (selected.resolve(),) if selected else BENCHMARKS:

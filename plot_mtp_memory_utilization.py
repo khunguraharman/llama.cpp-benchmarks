@@ -263,12 +263,15 @@ def output_dir_for(results_dir: Path, output_root: Path, device: str) -> Path:
     try:
         relative_path = results_dir.resolve().relative_to(results_root().resolve())
     except ValueError:
-        return output_root / device / "mtp-memory-utilization"
+        pass
+    else:
+        if relative_path.parts:
+            device = relative_path.parts[0]
 
-    if relative_path.parts:
-        return output_root / relative_path.parts[0] / "mtp-memory-utilization"
-
-    return output_root / device / "mtp-memory-utilization"
+    device_dir = output_root / device
+    if device == "nvidia-rtx-3080":
+        device_dir /= "mtp"
+    return device_dir / "mtp-memory-utilization"
 
 
 def annotate_base_memory(ax, baseline_mib: float) -> None:
