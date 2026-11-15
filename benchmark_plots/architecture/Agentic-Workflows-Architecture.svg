@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="488" height="156" viewBox="0 0 488 156" role="img" aria-labelledby="title description">
+  <title id="title">Agentic Workflows architecture</title>
+  <desc id="description">The Linux machine and both llama-server hosts share a private Class C network. Linux hosts the Pydantic Agent and an MCP server on port 8000. The agent sends inference requests to either the Windows Desktop with an RTX 3080 at 192.168.68.68:8080 or the M4 Mac Mini at 192.168.68.75:8080.</desc>
+  <style>
+    text { font: 12px "DM Sans", Arial, sans-serif; fill: #283531; }
+    .card { fill: #fff; stroke: #e1e8e3; }
+    .name { font-size: 13px; font-weight: 700; fill: #1c3028; }
+    .note { font-size: 11px; fill: #56645d; }
+    .code { font: 12px Consolas, monospace; fill: #16705c; }
+    .network-label { font-size: 11px; font-weight: 700; fill: #16705c; }
+  </style>
+  <rect x="1" y="8" width="486" height="147" rx="6" fill="#f4f7f5" stroke="#16705c" stroke-width="1.4" stroke-dasharray="5 3"/>
+  <rect x="12" y="0" width="134" height="17" rx="3" fill="#edf5f0"/>
+  <text class="network-label" x="79" y="12" text-anchor="middle">Private Class C network</text>
+
+  <rect class="card" x="13.5" y="34.5" width="163" height="99" rx="4"/>
+  <path d="M17 35h156" stroke="#16705c" stroke-width="2" stroke-linecap="round"/>
+  <text class="name" x="23" y="55">Linux Machine</text>
+  <rect class="card" x="23.5" y="64.5" width="143" height="25" rx="3"/>
+  <text x="30" y="81">MCP Server</text>
+  <rect x="97" y="69" width="64" height="16" rx="3" fill="#eff4f1"/>
+  <text class="note" x="129" y="81" text-anchor="middle">Port 8000</text>
+  <rect x="23.5" y="99.5" width="143" height="25" rx="3" fill="#edf5f0" stroke="#b9d2c4"/>
+  <text class="name" x="95" y="116" text-anchor="middle">Pydantic Agent</text>
+
+  <path d="M167 112H276V50h30 M276 112v4h30 M301 46l5 4-5 4 M301 112l5 4-5 4" fill="none" stroke="#4d7e6a" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+  <text class="note" x="223" y="89" text-anchor="middle">Inference requests</text>
+  <text class="note" x="223" y="103" text-anchor="middle">to either host</text>
+
+  <g text-anchor="middle">
+    <rect class="card" x="308.5" y="22.5" width="165" height="55" rx="4"/>
+    <text class="name" x="391" y="39">llama-server</text>
+    <text class="note" x="391" y="54">Windows Desktop RTX 3080</text>
+    <text class="code" x="391" y="70">192.168.68.68:8080</text>
+    <rect class="card" x="308.5" y="88.5" width="165" height="55" rx="4"/>
+    <text class="name" x="391" y="105">llama-server</text>
+    <text class="note" x="391" y="120">macOS M4</text>
+    <text class="code" x="391" y="136">192.168.68.75:8080</text>
+  </g>
+</svg>

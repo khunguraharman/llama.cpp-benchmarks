@@ -7,6 +7,7 @@ from statistics import mean
 
 from matplotlib import font_manager
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 from matplotlib.ticker import MaxNLocator, StrMethodFormatter
 
 from plot_agent_run import (
@@ -297,16 +298,13 @@ def plot_model_comparison(output, hardware, *, qwen3_log=LOG):
                       fontsize=11, color=MUTED)
     style_dashboard_legend(timeline, loc="upper left", fontsize=10, handles=handles)
 
-    prompt_records = []
-    request_totals = {}
+    conversation_records = []
     for index, (model, logs) in enumerate(models.items()):
         color = styles[model]
         conversation_totals = [[], []]
-        run_totals = []
         for run_index, (path, switches) in enumerate(logs):
             requests, _, _ = parse_log(path)
             origin = min(request.start for request in requests)
-            run_totals.append(summarize(requests))
             for totals, visits in zip(conversation_totals, split_conversations(requests, switches)):
                 totals.append(summarize([request for visit in visits for request in visit]))
 
@@ -331,34 +329,52 @@ def plot_model_comparison(output, hardware, *, qwen3_log=LOG):
             throughput.plot(times, rates, color=color, marker=".", linewidth=1.4,
                             linestyle=linestyle)
 
-        for totals in conversation_totals:
-            prompt_records.append(dict(
+        for conversation, totals in enumerate(conversation_totals, start=1):
+            conversation_records.append(dict(
                 run=model,
+                conversation=conversation,
                 prompt_tokens_processed=mean(run["prompt_tokens_processed"] for run in totals),
                 prompt_processing_seconds=mean(run["prompt_processing_seconds"] for run in totals),
+                active_request_seconds=mean(run["active_request_seconds"] for run in totals),
+                output_tokens=mean(run["output_tokens"] for run in totals),
             ))
-        request_totals[model] = run_totals
 
     format_timeline(evaluated, "Newly evaluated prompt tokens per request", "Tokens (log scale)", {}, log=True)
     format_timeline(speed, "Prompt processing speed", "Tokens / s", {})
-    plot_totals(prompt_tokens, prompt_records, styles, "prompt_tokens_processed",
+    plot_totals(prompt_tokens, conversation_records, styles, "prompt_tokens_processed",
                 "Total prompt tokens processed", "Tokens")
-    plot_totals(prompt_time, prompt_records, styles, "prompt_processing_seconds",
+    plot_totals(prompt_time, conversation_records, styles, "prompt_processing_seconds",
                 "Total time processing prompts", "Seconds")
     format_timeline(generated, "Generated tokens per request", "Tokens (log scale)", {}, log=True)
     format_timeline(throughput, f"Generation throughput · latest {THROUGHPUT_WINDOW} requests",
                     "Tokens / s (weighted average)", {})
+    conversation_opacities = (1, .4)
+    request_fig.legend(handles=[
+        Patch(facecolor=MUTED, alpha=opacity, label=f"Conversation {conversation}")
+        for conversation, opacity in enumerate(conversation_opacities, start=1)
+    ], loc="upper right", bbox_to_anchor=(.97, .92), ncol=2, frameon=False)
     for ax, field, title, unit, precision in (
-        (active, "active_request_seconds", "Time spent processing requests", "Seconds", 1),
+        (active, "active_request_seconds", "Time spent processing requests", "Seconds", 2),
         (output_tokens, "output_tokens", "Total output tokens", "Tokens", 0),
     ):
         set_dashboard_title(ax, title)
         ax.set_ylabel(unit)
-        values = [mean(run[field] for run in totals) for totals in request_totals.values()]
-        bars = ax.bar(range(len(models)), values, width=.56, color=list(styles.values()))
-        ax.bar_label(bars, labels=[f"{value:,.{precision}f}" for value in values],
+        positions = range(len(models))
+        first, second = ([record[field] for record in conversation_records
+                          if record["conversation"] == conversation] for conversation in (1, 2))
+        lower = ax.bar(positions, first, width=.56, color=list(styles.values()),
+                       alpha=conversation_opacities[0])
+        upper = ax.bar(positions, second, bottom=first, width=.56, color=list(styles.values()),
+                       alpha=conversation_opacities[1])
+        lower_labels = ax.bar_label(lower, labels=[f"{value:,.{precision}f}" for value in first],
+                                    label_type="center", fontsize=8, color=HEADING)
+        lower_labels[0].set_color(BACKGROUND)
+        ax.bar_label(upper, labels=[f"{value:,.{precision}f}" for value in second],
+                     label_type="center", fontsize=8, color=HEADING)
+        values = [left + right for left, right in zip(first, second)]
+        ax.bar_label(upper, labels=[f"{value:,.{precision}f}" for value in values],
                      padding=5, color=HEADING)
-        ax.set_xticks(range(len(models)), list(models))
+        ax.set_xticks(positions, list(models))
         ax.set_ylim(0, max(values) * 1.2)
         ax.yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))
     timeline.set(xlabel="Elapsed since first prompt (s)", ylabel="Generated tokens per request",
