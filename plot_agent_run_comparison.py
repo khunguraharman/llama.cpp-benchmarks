@@ -80,9 +80,10 @@ def create_figure(rows, title, subtitle, styles, runs, prefix):
     fig, axes = plt.subplots(rows, 2, figsize=(14, 4 * rows + 1))
     for ax in axes.flat:
         apply_dashboard_style(fig, ax)
-    fig.text(.08, .95, f"{MODEL_LABELS[prefix]} · {title}", fontsize=23,
-             fontfamily="Space Grotesk", fontweight="medium", color=HEADING)
-    fig.text(.08, .902 if rows == 2 else .865, subtitle, fontsize=11, color=MUTED)
+    if title:
+        fig.text(.08, .95, f"{MODEL_LABELS[prefix]} · {title}", fontsize=23,
+                 fontfamily="Space Grotesk", fontweight="medium", color=HEADING)
+        fig.text(.08, .902 if rows == 2 else .865, subtitle, fontsize=11, color=MUTED)
     handles = [Line2D([], [], color=color, linewidth=3, label=label)
                for label, color in styles.items()]
     if any(restores for _, _, restores in runs.values()):
@@ -90,7 +91,8 @@ def create_figure(rows, title, subtitle, styles, runs, prefix):
                               label="Prompt state loaded from RAM"))
     fig.legend(handles=handles, loc="lower center", ncol=len(handles), frameon=False)
     fig.subplots_adjust(left=.08, right=.97, bottom=.20 if rows == 1 else .11,
-                        top=.72 if rows == 1 else .81, wspace=.28, hspace=.54)
+                        top=.90 if not title else (.72 if rows == 1 else .81),
+                        wspace=.28, hspace=.54)
     return fig, axes.flat
 
 
@@ -119,7 +121,8 @@ def format_timeline(ax, title, unit, runs, *, log=False):
 
 
 def plot_totals(ax, records, styles, field, title, unit):
-    set_dashboard_title(ax, title)
+    if title:
+        set_dashboard_title(ax, title)
     ax.set_ylabel(unit)
     width = .68 / len(styles)
     for index, (run, color) in enumerate(styles.items()):
@@ -136,30 +139,34 @@ def plot_totals(ax, records, styles, field, title, unit):
     ax.yaxis.set_major_formatter(StrMethodFormatter("{x:,.1f}" if field.endswith("_seconds") else "{x:,.0f}"))
 
 
-def plot_prompts(runs, records, styles, hardware, output, prefix):
-    fig, (evaluated, speed, total_tokens, total_time) = create_figure(
-        2, "Prompt processing", f"{hardware}  /  Request metrics at prompt start", styles, runs, prefix)
-    elapsed = max(requests[-1].start - requests[0].start for requests, _, _ in runs.values())
-    width = max(elapsed / 270, .01)
-    for index, (run, color) in enumerate(styles.items()):
-        requests, _, _ = runs[run]
-        starts = [request.start - requests[0].start for request in requests]
-        positive = [(start, request.prefill[0]) for start, request in zip(starts, requests)
-                    if request.prefill[0] > 0]
-        if positive:
-            times, tokens = zip(*positive)
-            # The bar edge is the prompt start, with each cache setting on its own side.
-            evaluated.bar(times, tokens, width=-width if index == 0 else width,
-                          align="edge", color=color)
-        speed.plot(starts, [request.prefill[1] for request in requests],
-                   color=color, marker=".", linewidth=1.4)
+def plot_prompts(runs, records, styles, hardware, output, prefix, *, totals_only=False):
+    if totals_only:
+        fig, (total_tokens, total_time) = create_figure(1, "", "", styles, {}, prefix)
+    else:
+        fig, (evaluated, speed, total_tokens, total_time) = create_figure(
+            2, "Prompt processing", f"{hardware}  /  Request metrics at prompt start", styles, runs, prefix)
+        elapsed = max(requests[-1].start - requests[0].start for requests, _, _ in runs.values())
+        width = max(elapsed / 270, .01)
+        for index, (run, color) in enumerate(styles.items()):
+            requests, _, _ = runs[run]
+            starts = [request.start - requests[0].start for request in requests]
+            positive = [(start, request.prefill[0]) for start, request in zip(starts, requests)
+                        if request.prefill[0] > 0]
+            if positive:
+                times, tokens = zip(*positive)
+                # The bar edge is the prompt start, with each cache setting on its own side.
+                evaluated.bar(times, tokens, width=-width if index == 0 else width,
+                              align="edge", color=color)
+            speed.plot(starts, [request.prefill[1] for request in requests],
+                       color=color, marker=".", linewidth=1.4)
 
-    format_timeline(evaluated, "Newly evaluated prompt tokens per request", "Tokens (log scale)", runs, log=True)
-    format_timeline(speed, "Prompt processing speed", "Tokens / s", runs)
+        format_timeline(evaluated, "Newly evaluated prompt tokens per request", "Tokens (log scale)", runs, log=True)
+        format_timeline(speed, "Prompt processing speed", "Tokens / s", runs)
     plot_totals(total_tokens, records, styles, "prompt_tokens_processed",
-                "Total prompt tokens processed", "Tokens")
+                "Total Prompt Tokens Processed" if totals_only else "Total prompt tokens processed", "Tokens")
     plot_totals(total_time, records, styles, "prompt_processing_seconds",
-                "Total time processing prompts", "Seconds")
+                "" if totals_only else "Total time processing prompts",
+                "Prompt processing time (s)" if totals_only else "Seconds")
     save_figure(fig, output, "prompt-processing", prefix=prefix)
 
 
@@ -447,7 +454,8 @@ def plot_comparison(log, output, hardware, switches, cached_only, *, prefix=FILE
                                 **summarize([request for visit in visits for request in visit])))
 
     output.mkdir(parents=True, exist_ok=True)
-    plot_prompts(runs, records, styles, hardware, output, prefix)
+    plot_prompts(runs, records, styles, hardware, output, prefix,
+                 totals_only=log in BENCHMARKS and not cached_only)
     plot_requests(runs, records, visits_by_conversation, styles, hardware, output, prefix)
     plot_cache(runs, styles, hardware, output, prefix)
     with (output / f"{prefix}-run-comparison.csv").open("w", newline="") as handle:

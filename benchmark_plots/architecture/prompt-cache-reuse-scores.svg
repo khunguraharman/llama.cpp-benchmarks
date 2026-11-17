@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" aria-labelledby="description" width="2280" height="420" viewBox="0 0 1140 210" role="img">
+  <desc id="description">Prefix-based reuse scores for GPU slot i.</desc>
+  <rect width="1140" height="210" fill="white" />
+  <g font-family="Segoe UI, sans-serif">
+    <text font-size="16" text-anchor="start" dominant-baseline="central" x="210" y="31" fill="#4D5E70">Example token sequences</text>
+    <text font-size="16" text-anchor="start" dominant-baseline="central" x="683" y="31" fill="#4D5E70">Fraction of state kept</text>
+    <text font-size="16" text-anchor="start" dominant-baseline="central" x="928" y="31" fill="#4D5E70">Similarity</text>
+    <text font-size="19" text-anchor="start" dominant-baseline="central" font-weight="700" x="32" y="66" fill="#182633">Active GPU Slot i</text>
+    <text font-size="14" text-anchor="start" dominant-baseline="central" x="32" y="89" fill="#4D5E70" xml:space="preserve"><tspan font-style="italic">S</tspan><tspan font-style="italic" font-size="10" baseline-shift="-4">i</tspan><tspan> tokens</tspan></text>
+    <rect x="210" y="58" width="36" height="36" rx="6" fill="#E0F3ED" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="700" x="228" y="76" fill="#12624E">A</text>
+    <rect x="254" y="58" width="36" height="36" rx="6" fill="#E0F3ED" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="700" x="272" y="76" fill="#12624E">B</text>
+    <rect x="298" y="58" width="36" height="36" rx="6" fill="#E0F3ED" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="700" x="316" y="76" fill="#12624E">C</text>
+    <rect x="342" y="58" width="36" height="36" rx="6" fill="#E0F3ED" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="700" x="360" y="76" fill="#12624E">D</text>
+    <rect x="386" y="58" width="36" height="36" rx="6" fill="#F2F5F8" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" x="404" y="76" fill="#4D5E70">E</text>
+    <rect x="430" y="58" width="36" height="36" rx="6" fill="#F2F5F8" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" x="448" y="76" fill="#4D5E70">F</text>
+    <rect x="474" y="58" width="36" height="36" rx="6" fill="#F2F5F8" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" x="492" y="76" fill="#4D5E70">G</text>
+    <rect x="518" y="58" width="36" height="36" rx="6" fill="#F2F5F8" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" x="536" y="76" fill="#4D5E70">H</text>
+    <text font-size="20" text-anchor="start" dominant-baseline="central" font-weight="700" x="683" y="76" fill="#182633" xml:space="preserve"><tspan font-style="italic">f</tspan><tspan font-size="14" baseline-shift="-6">keep, slot, </tspan><tspan font-style="italic" font-size="14" baseline-shift="-6">i</tspan><tspan> = </tspan><tspan font-style="italic">m</tspan><tspan font-style="italic" font-size="14" baseline-shift="-6">i</tspan><tspan> / </tspan><tspan font-style="italic">S</tspan><tspan font-style="italic" font-size="14" baseline-shift="-6">i</tspan></text>
+    <text font-size="20" text-anchor="start" dominant-baseline="central" font-weight="700" x="928" y="76" fill="#182633" xml:space="preserve"><tspan>sim</tspan><tspan font-size="14" baseline-shift="-6">slot, </tspan><tspan font-style="italic" font-size="14" baseline-shift="-6">i</tspan><tspan> = </tspan><tspan font-style="italic">m</tspan><tspan font-style="italic" font-size="14" baseline-shift="-6">i</tspan><tspan> / </tspan><tspan font-style="italic">P</tspan></text>
+    <text font-size="19" text-anchor="start" dominant-baseline="central" font-weight="700" x="32" y="124" fill="#182633">Incoming prompt</text>
+    <text font-size="14" text-anchor="start" dominant-baseline="central" x="32" y="147" fill="#4D5E70" xml:space="preserve"><tspan font-style="italic">P</tspan><tspan> tokens</tspan></text>
+    <rect x="210" y="116" width="36" height="36" rx="6" fill="#E0F3ED" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="700" x="228" y="134" fill="#12624E">A</text>
+    <rect x="254" y="116" width="36" height="36" rx="6" fill="#E0F3ED" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="700" x="272" y="134" fill="#12624E">B</text>
+    <rect x="298" y="116" width="36" height="36" rx="6" fill="#E0F3ED" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="700" x="316" y="134" fill="#12624E">C</text>
+    <rect x="342" y="116" width="36" height="36" rx="6" fill="#E0F3ED" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" font-weight="700" x="360" y="134" fill="#12624E">D</text>
+    <rect x="386" y="116" width="36" height="36" rx="6" fill="#F2F5F8" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" x="404" y="134" fill="#4D5E70">X</text>
+    <rect x="430" y="116" width="36" height="36" rx="6" fill="#F2F5F8" />
+    <text font-size="18" text-anchor="middle" dominant-baseline="central" x="448" y="134" fill="#4D5E70">Y</text>
+    <path d="M 210 159 V 167 H 378 V 159" fill="none" stroke="#7CB9A6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><text x="294.0" y="184" font-size="16" text-anchor="middle" dominant-baseline="central" fill="#12624E" xml:space="preserve"><tspan font-style="italic">m</tspan><tspan font-style="italic" font-size="11" baseline-shift="-4">i</tspan><tspan> matching tokens</tspan></text></g>
+</svg>
